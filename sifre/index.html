@@ -1,0 +1,188 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex">
+<meta name="referrer" content="no-referrer">
+<title>Peron · Yeni şifre</title>
+<meta name="theme-color" content="#d8c69c" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1b17" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../img/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,600;1,400&display=swap">
+<script>
+  // E-postadaki bağlantının taşıdığı bilgiyi al ve adres çubuğundan hemen sil.
+  (function () {
+    var p = new URLSearchParams(location.search);
+    var h = new URLSearchParams(location.hash.replace(/^#/, ''));
+    // Varsayılan Supabase e-postası: bağlantı #access_token=…&refresh_token=…&type=recovery ile gelir.
+    window.SIFRE_OTURUM = h.get('type') === 'recovery' && h.get('access_token') && h.get('refresh_token')
+      ? { access_token: h.get('access_token'), refresh_token: h.get('refresh_token') } : null;
+    // Özel e-posta şablonu kullanılırsa: ?token_hash=…&type=recovery
+    window.SIFRE_ANAHTAR = p.get('type') === 'recovery' ? p.get('token_hash') : null;
+    window.SIFRE_HATA = !!(p.get('error') || h.get('error'));
+    if (location.search || location.hash) history.replaceState(null, '', location.pathname);
+  })();
+</script>
+<style>
+  :root {
+    --kagit: #f4ecd8; --kagit-acik: #fbf5e6; --cekmece: #d8c69c;
+    --murekkep: #2b2721; --soluk: #6e6350; --mercan: #e2603f; --mercan-metin: #b04428;
+    --kart-kenar: rgba(43, 39, 33, .2); --cizgi: rgba(70, 110, 165, .3);
+    --cta: #2b2721; --cta-metin: #f4ecd8;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --kagit: #28241e; --kagit-acik: #2e2a23; --cekmece: #1d1b17;
+      --murekkep: #e8dfca; --soluk: #9a8f79; --mercan-metin: #e2603f;
+      --kart-kenar: rgba(232, 223, 202, .15); --cizgi: rgba(140, 170, 210, .18);
+      --cta: #e2603f; --cta-metin: #1d1b17;
+    }
+  }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; min-height: 100%; background: var(--cekmece); color: var(--murekkep); -webkit-text-size-adjust: 100%; }
+  body { font: 400 15px/1.5 'Courier Prime', 'Courier New', monospace; padding: max(24px, env(safe-area-inset-top)) 16px 40px; }
+  .ust { display: flex; align-items: center; gap: 8px; max-width: 440px; margin: 0 auto 12px;
+         font: 700 14px 'Archivo Narrow', 'Arial Narrow', sans-serif; letter-spacing: .24em; }
+  .ust img { width: 22px; height: 22px; border-radius: 5px; }
+  .cizgi { max-width: 440px; margin: 0 auto 28px; border-top: 1.5px solid var(--murekkep); border-bottom: 1.5px solid var(--murekkep); height: 5px; }
+  .fis { max-width: 440px; margin: 0 auto; background: var(--kagit); border: 1px solid var(--kart-kenar); padding: 0 0 22px; }
+  .fis-ust { display: flex; justify-content: space-between; padding: 9px 16px 7px; border-bottom: 1.5px solid var(--mercan); font-size: 12px; color: var(--soluk); }
+  h1 { font: 600 34px/1.1 'Crimson Pro', Georgia, serif; margin: 22px 16px 10px; }
+  p { margin: 0 16px 10px; }
+  .soluk { color: var(--soluk); font: italic 400 18px/1.4 'Crimson Pro', Georgia, serif; }
+  .damga { display: inline-block; margin: 6px 16px 18px; padding: 4px 12px; transform: rotate(-6deg);
+           font: 700 22px 'Courier Prime', monospace; letter-spacing: .12em; color: var(--mercan);
+           border: 2.5px solid var(--mercan); outline: 1px solid var(--mercan); outline-offset: 3px; }
+  .adim { margin: 16px 16px 0; padding: 12px 14px; background: var(--kagit-acik); border: 1px dashed var(--soluk); }
+  .adim b { font-weight: 700; }
+  form { margin: 8px 16px 0; }
+  label { display: flex; align-items: center; gap: 12px; min-height: 52px; border-bottom: 1px solid var(--cizgi); }
+  label span { flex: 0 0 92px; font: 700 11px 'Archivo Narrow', sans-serif; letter-spacing: .2em; color: var(--soluk); }
+  input { flex: 1; min-width: 0; border: 0; background: transparent; color: var(--murekkep); font: 400 17px 'Courier Prime', monospace; padding: 12px 0; outline: none; }
+  input::placeholder { color: var(--soluk); opacity: .6; }
+  button { width: 100%; height: 54px; margin-top: 20px; border: 0; background: var(--cta); color: var(--cta-metin);
+           font: 700 16px 'Archivo Narrow', sans-serif; letter-spacing: .16em; cursor: pointer; }
+  button:disabled { opacity: .55; cursor: default; }
+  .hata { min-height: 22px; margin: 12px 0 0; font-weight: 700; color: var(--mercan-metin); }
+  [hidden] { display: none !important; }
+</style>
+</head>
+<body>
+  <div class="ust"><img src="../img/icon-180.png" alt="">PERON</div>
+  <div class="cizgi"></div>
+
+  <!-- E-postadaki bağlantıyla gelindiğinde: yeni şifre -->
+  <div class="fis" id="yeni" hidden>
+    <div class="fis-ust"><span>YOLCU KARTI</span><span>YENİ ŞİFRE</span></div>
+    <h1>Yeni şifreni belirle.</h1>
+    <p class="soluk">En az 6 karakter olsun.</p>
+    <form id="yeni-form" novalidate>
+      <label><span>YENİ ŞİFRE</span><input id="s1" type="password" autocomplete="new-password" placeholder="••••••" required></label>
+      <label><span>TEKRAR</span><input id="s2" type="password" autocomplete="new-password" placeholder="••••••" required></label>
+      <div class="hata" id="yeni-hata" role="alert"></div>
+      <button type="submit" id="yeni-btn">ŞİFREYİ DEĞİŞTİR</button>
+    </form>
+  </div>
+
+  <!-- Şifre değişti -->
+  <div class="fis" id="tamam" hidden>
+    <div class="fis-ust"><span>YOLCU KARTI</span><span>YENİ ŞİFRE</span></div>
+    <div class="damga">DEĞİŞTİ</div>
+    <h1>Şifren değişti.</h1>
+    <div class="adim"><b>Şimdi:</b> Peron uygulamasını aç ve yeni şifrenle giriş yap.</div>
+  </div>
+
+  <!-- Bağlantısız gelindiğinde: sıfırlama e-postası iste -->
+  <div class="fis" id="iste" hidden>
+    <div class="fis-ust"><span>YOLCU KARTI</span><span>ŞİFREMİ UNUTTUM</span></div>
+    <h1>Şifreni mi unuttun?</h1>
+    <p class="soluk">E-posta adresini yaz, yeni şifre bağlantısı gönderelim.</p>
+    <form id="iste-form" novalidate>
+      <label><span>E-POSTA</span><input id="eposta" type="email" autocomplete="email" inputmode="email" autocapitalize="off" placeholder="ad@ornek.com" required></label>
+      <div class="hata" id="iste-hata" role="alert"></div>
+      <button type="submit" id="iste-btn">BAĞLANTI GÖNDER</button>
+    </form>
+  </div>
+
+  <div class="fis" id="gonderildi" hidden>
+    <div class="fis-ust"><span>YOLCU KARTI</span><span>ŞİFREMİ UNUTTUM</span></div>
+    <div class="damga">YOLDA</div>
+    <h1>E-postanı kontrol et.</h1>
+    <div class="adim">Bu adresle bir Peron üyeliği varsa yeni şifre bağlantısı birkaç dakika içinde gelir. Gelen kutunda yoksa istenmeyen klasörüne de bak.</div>
+  </div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script>
+  // Uygulamayla aynı Supabase projesi; yayınlanabilir anahtar herkese açık olacak şekilde tasarlanmıştır (erişim RLS ile sınırlı).
+  var sb = supabase.createClient('https://arxwwekjxgrgyruopvzp.supabase.co', 'sb_publishable_sPMEqz96nenj0LYJyGUB8g_4YeLFx-Z',
+    { auth: { flowType: 'implicit', persistSession: false, autoRefreshToken: false, detectSessionInUrl: false } });
+  var SAYFA = 'https://getperon.app/sifre/';
+  var $ = function (id) { return document.getElementById(id); };
+  function goster(id) { ['yeni', 'tamam', 'iste', 'gonderildi'].forEach(function (k) { $(k).hidden = k !== id; }); }
+
+  var anahtar = window.SIFRE_ANAHTAR, oturum = window.SIFRE_OTURUM;
+  goster(anahtar || oturum ? 'yeni' : 'iste');
+  if (!anahtar && !oturum && window.SIFRE_HATA) $('iste-hata').textContent = 'Bağlantının süresi dolmuş ya da daha önce kullanılmış. Yenisini iste.';
+
+  $('yeni-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var s1 = $('s1').value, s2 = $('s2').value, hata = $('yeni-hata');
+    hata.textContent = '';
+    if (s1.length < 6) { hata.textContent = 'Şifre en az 6 karakter olmalı.'; return; }
+    if (s1 !== s2) { hata.textContent = 'İki şifre aynı değil.'; return; }
+    $('yeni-btn').disabled = true;
+    try {
+      if (oturum) {
+        var o = await sb.auth.setSession(oturum);
+        if (o.error) throw { kod: 'anahtar' };
+        oturum = null;
+      } else if (anahtar) {
+        var v = await sb.auth.verifyOtp({ token_hash: anahtar, type: 'recovery' });
+        if (v.error) throw { kod: 'anahtar' };
+        anahtar = null;   // tek kullanımlık
+      }
+      var u = await sb.auth.updateUser({ password: s1 });
+      if (u.error) throw u.error;
+      await sb.auth.signOut({ scope: 'local' });
+      goster('tamam');
+    } catch (err) {
+      if (err && (err.kod === 'anahtar' || err.status === 401 || err.status === 403 ||
+                  /expired|invalid|jwt|session/i.test(err.message || ''))) {
+        goster('iste');
+        $('iste-hata').textContent = 'Bağlantının süresi dolmuş ya da daha önce kullanılmış. Yenisini iste.';
+      } else if (err && /same|different/i.test(err.message || '')) {
+        hata.textContent = 'Yeni şifre eskisiyle aynı olamaz.';
+      } else if (err && /weak|short|least/i.test(err.message || '')) {
+        hata.textContent = 'Bu şifre çok zayıf. Daha uzun bir şifre dene.';
+      } else {
+        hata.textContent = 'Şifre değiştirilemedi. Biraz sonra yeniden dene.';
+      }
+    } finally {
+      $('yeni-btn').disabled = false;
+    }
+  });
+
+  $('iste-form').addEventListener('submit', async function (e) {
+    e.preventDefault();
+    var eposta = $('eposta').value.trim(), hata = $('iste-hata');
+    hata.textContent = '';
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(eposta)) { hata.textContent = 'Geçerli bir e-posta adresi yaz.'; return; }
+    $('iste-btn').disabled = true;
+    var r = await sb.auth.resetPasswordForEmail(eposta, { redirectTo: SAYFA });
+    $('iste-btn').disabled = false;
+    var m = (r.error && (r.error.code + ' ' + r.error.message)) || '';
+    // Kişiye özel bekleme: "you can only request this after 42 seconds"
+    var sn = /after (\d+) seconds?/i.exec(m);
+    if (sn) { hata.textContent = sn[1] + ' saniye sonra yeniden dene.'; return; }
+    // Projenin saatlik e-posta sınırı (Supabase'in ücretsiz e-posta servisi)
+    if (/email.*rate|over_email_send|rate limit/i.test(m)) { hata.textContent = 'Şu an çok fazla e-posta istendi. Lütfen bir saat sonra yeniden dene.'; return; }
+    if (/too many|429/i.test(m)) { hata.textContent = 'Çok sık denendi. Biraz bekleyip yeniden dene.'; return; }
+    if (r.error) { hata.textContent = 'Gönderilemedi. Biraz sonra yeniden dene.'; return; }
+    goster('gonderildi');
+  });
+</script>
+</body>
+</html>

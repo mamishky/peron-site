@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<script>
+  // Üyelik e-postasındaki bağlantı ana sayfaya düşerse doğru sayfaya aktar.
+  if (/type=recovery/.test(location.hash + location.search))
+    location.replace('sifre/' + location.search + location.hash);
+  else if (/(access_token|error_description|error_code)=/.test(location.hash) || /[?&](code|error)=/.test(location.search))
+    location.replace('onay/' + location.search + location.hash);
+</script>
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Peron · Okuma yolculuğun</title>
+<meta name="description" content="Peron, okuma listeni bir kütüphane fişi ve tren bileti gibi tutan iPhone uygulaması. Serileri hatlara böl, bitirdiğin her kitapta biletini zımbala.">
+<meta name="theme-color" content="#d8c69c" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1b17" media="(prefers-color-scheme: dark)">
+<meta property="og:title" content="Peron · Okuma yolculuğun">
+<meta property="og:description" content="Okuduğun her kitap bir sefer. Serileri hatlara böl, bitirdiğinde biletini zımbala.">
+<meta property="og:image" content="https://getperon.app/img/icon-512.png">
+<meta property="og:url" content="https://getperon.app/">
+<link rel="icon" href="img/icon-512.png">
+<link rel="apple-touch-icon" href="img/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
+<style>
+  :root {
+    --kagit: #f4ecd8; --kagit-acik: #fbf5e6; --cekmece: #d8c69c; --cekmece-koyu: #c4ae80;
+    --murekkep: #2b2721; --soluk: #6e6350; --mercan: #e2603f; --mercan-metin: #b04428;
+    --kart-kenar: rgba(43, 39, 33, .2); --kenar-soluk: rgba(43, 39, 33, .35);
+    --cta: #2b2721; --cta-metin: #f4ecd8;
+    --gren: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.28 0 0 0 0 0.18 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+    --gren-op: .45;
+    --f-etiket: 'Archivo Narrow', 'Arial Narrow', sans-serif;
+    --f-eser: 'Crimson Pro', Georgia, serif;
+    --f-veri: 'Courier Prime', 'Courier New', monospace;
+    --hat-r: #d9a21b; --hat-c: #2f7d50; --hat-t: #4b98c4; --hat-b: #2c4f9b; --hat-k: #a6435c;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root {
+      --kagit: #28241e; --kagit-acik: #2e2a23; --cekmece: #1d1b17; --cekmece-koyu: #141310;
+      --murekkep: #e8dfca; --soluk: #9a8f79; --mercan-metin: #e2603f;
+      --kart-kenar: rgba(232, 223, 202, .15); --kenar-soluk: rgba(232, 223, 202, .3);
+      --cta: #e2603f; --cta-metin: #1d1b17;
+      --gren: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.96 0 0 0 0 0.88 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+      --gren-op: .12;
+      --hat-r: #f0bd3a; --hat-c: #5fb784; --hat-t: #7cc0e6; --hat-b: #7a9be0; --hat-k: #dd7c95;
+    }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
+  body { margin: 0; background: var(--cekmece); color: var(--murekkep); font: 400 16px/1.55 var(--f-veri); overflow-x: hidden; }
+  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; background-image: var(--gren); opacity: var(--gren-op); }
+  img { display: block; max-width: 100%; }
+  a { color: inherit; }
+  .sar { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
+  .etiket { font: 700 12px/1.3 var(--f-etiket); letter-spacing: .22em; text-transform: uppercase; }
+  .soluk { color: var(--soluk); }
+  .cift { border-top: 1.5px solid var(--murekkep); border-bottom: 1.5px solid var(--murekkep); height: 5px; }
+
+  /* Üst */
+  header { padding: max(14px, env(safe-area-inset-top)) 0 0; }
+  .ust { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; }
+  .marka { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 700 16px var(--f-etiket); letter-spacing: .26em; }
+  .marka img { width: 30px; height: 30px; border-radius: 7px; }
+  .ust .veri { font-size: 13px; }
+
+  /* Giriş */
+  .giris { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 56px 0 64px; }
+  .giris h1 { font: 600 clamp(44px, 7vw, 76px)/1.02 var(--f-eser); margin: 14px 0 18px; letter-spacing: -.01em; }
+  .giris h1 em { font-style: italic; font-weight: 400; color: var(--mercan-metin); }
+  .giris p.on { font: 400 20px/1.5 var(--f-eser); margin: 0 0 28px; max-width: 34em; }
+  .indir { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; }
+  .appstore { display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 22px; background: var(--cta); color: var(--cta-metin);
+              text-decoration: none; font: 700 15px var(--f-etiket); letter-spacing: .14em; border: 0; }
+  .appstore svg { width: 22px; height: 22px; fill: currentColor; }
+  .appstore[aria-disabled="true"] { cursor: default; }
+  .indir small { font-size: 13px; color: var(--soluk); max-width: 22em; }
+
+  .telefon-alani { position: relative; display: flex; justify-content: center; }
+  .telefon { width: min(300px, 78vw); border-radius: 38px; padding: 9px; background: #121110; box-shadow: 0 24px 50px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.4); }
+  .telefon img { width: 100%; border-radius: 30px; }
+  .giris .telefon { transform: rotate(2.5deg); }
+  .damga { position: absolute; left: 0; bottom: 12%; padding: 6px 14px; transform: rotate(-9deg);
+           font: 700 22px var(--f-veri); letter-spacing: .12em; color: var(--mercan); background: color-mix(in srgb, var(--kagit) 85%, transparent);
+           border: 3px solid var(--mercan); outline: 1px solid var(--mercan); outline-offset: 3px; }
+
+  /* Bölümler */
+  section { padding: 60px 0; }
+  .baslik { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
+  .baslik h2 { font: 600 clamp(32px, 4.6vw, 46px)/1.1 var(--f-eser); margin: 8px 0 0; }
+  .cizgi-m { border-top: 1.5px solid var(--mercan); margin: 14px 0 28px; }
+
+  /* Nasıl çalışır: biletler */
+  .adimlar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; padding: 0; margin: 0; }
+  .bilet { position: relative; background: var(--kagit-acik); border: 1px solid var(--kart-kenar); padding: 18px 20px 20px 20px; }
+  .bilet::after { content: ""; position: absolute; right: 14px; top: 16px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px dashed var(--kenar-soluk); }
+  .bilet .no { font: 700 13px var(--f-veri); color: var(--mercan-metin); }
+  .bilet h3 { font: 600 26px/1.15 var(--f-eser); margin: 6px 0 6px; }
+  .bilet p { margin: 0; font-size: 15px; }
+
+  /* Özellikler: katalog fişleri */
+  .fisler { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
+  .fis { background: var(--kagit); border: 1px solid var(--kart-kenar); }
+  .fis .ust-satir { display: flex; justify-content: space-between; padding: 8px 14px 6px; border-bottom: 1.5px solid var(--mercan); font-size: 12px; color: var(--soluk); }
+  .fis .ic { padding: 12px 14px 16px; }
+  .fis h3 { font: 600 24px/1.15 var(--f-eser); margin: 0 0 6px; }
+  .fis p { margin: 0; font-size: 14.5px; }
+  .serit { display: flex; gap: 3px; margin-top: 12px; }
+  .serit i { flex: 1; height: 7px; background: var(--c); opacity: .9; }
+  .serit i.bos { opacity: .25; }
+
+  /* Ekranlar */
+  .ekranlar { display: grid; grid-auto-flow: column; grid-auto-columns: min(230px, 62vw); gap: 22px; overflow-x: auto; padding: 6px 4px 22px;
+              scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
+  .ekranlar figure { margin: 0; scroll-snap-align: start; }
+  .ekranlar .telefon { width: 100%; border-radius: 30px; padding: 7px; }
+  .ekranlar .telefon img { border-radius: 24px; }
+  .ekranlar figcaption { margin-top: 12px; font-size: 14px; }
+  .ekranlar figcaption b { display: block; font: 700 12px var(--f-etiket); letter-spacing: .18em; }
+
+  /* Kapanış */
+  .kapanis { background: var(--kagit); border: 1.5px solid var(--murekkep); padding: 34px 24px; text-align: center; }
+  .kapanis img { width: 88px; height: 88px; border-radius: 20px; margin: 0 auto 14px; }
+  .kapanis h2 { font: 600 clamp(30px, 4.4vw, 42px)/1.1 var(--f-eser); margin: 0 0 10px; }
+  .kapanis p { margin: 0 auto 22px; max-width: 30em; }
+  .kapanis .indir { justify-content: center; }
+
+  footer { padding: 36px 0 max(36px, env(safe-area-inset-bottom)); font-size: 13px; color: var(--soluk); }
+  footer .sar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
+
+  @media (max-width: 860px) {
+    .giris { grid-template-columns: 1fr; padding: 36px 0 48px; gap: 36px; }
+    .adimlar, .fisler { grid-template-columns: 1fr; }
+    .damga { left: 4%; }
+    section { padding: 44px 0; }
+  }
+  @media (min-width: 861px) and (max-width: 1020px) { .fisler { grid-template-columns: repeat(2, 1fr); } }
+</style>
+</head>
+<body>
+<header>
+  <div class="sar">
+    <div class="ust">
+      <a class="marka" href="./"><img src="img/icon-180.png" alt="">PERON</a>
+      <span class="veri">OKUMA DEFTERİ · iPHONE</span>
+    </div>
+    <div class="cift"></div>
+  </div>
+</header>
+
+<main>
+  <div class="sar giris">
+    <div>
+      <div class="etiket soluk">Kütüphane fişi + tren bileti</div>
+      <h1>Okuduğun her kitap <em>bir sefer.</em></h1>
+      <p class="on">Peron, okuma listeni bir kütüphane fişi ve tren bileti gibi tutar. Serileri hatlara böl, sıradaki kitabını gör, bitirdiğinde biletini zımbala. Yılın sonunda da ne kadar yol aldığına bak.</p>
+      <div class="indir">
+        <a class="appstore" data-appstore href="#" aria-disabled="true">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.2 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.55zM14.2 6.13c.61-.74 1.02-1.76.9-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.6-1.23z"/></svg>
+          <span data-appstore-yazi>APP STORE'DA YAKINDA</span>
+        </a>
+        <small data-appstore-not>Şu an TestFlight'ta deneniyor. App Store'a çıktığında indirme bağlantısı burada olacak.</small>
+      </div>
+    </div>
+    <div class="telefon-alani">
+      <div class="telefon">
+        <picture>
+          <source srcset="img/seri-dark.webp" media="(prefers-color-scheme: dark)">
+          <img src="img/seri-light.webp" width="640" height="1391" alt="Peron ana ekranı: yıl damgası, son sefer ve seriler çekmecesi">
+        </picture>
+      </div>
+      <div class="damga" aria-hidden="true">18 SEFER</div>
+    </div>
+  </div>
+
+  <section id="nasil">
+    <div class="sar">
+      <div class="baslik"><div><div class="etiket soluk">Nasıl çalışır</div><h2>Üç adımda yolculuk</h2></div></div>
+      <div class="cizgi-m"></div>
+      <ol class="adimlar">
+        <li class="bilet"><div class="no">01 · FİŞ AÇ</div><h3>Kitabını ekle</h3><p>Okuduğun ya da okumak istediğin bir seriyi veya tek kitabı ekle. Seri için başlıkları sırayla yazman yeterli.</p></li>
+        <li class="bilet"><div class="no">02 · YOLA ÇIK</div><h3>Sıradaki sefer</h3><p>Peron seride kaldığın yeri hatırlar; sıradaki kitabın her zaman en üstte seni bekler.</p></li>
+        <li class="bilet"><div class="no">03 · ZIMBALA</div><h3>Biletini zımbala</h3><p>Kitabı bitirince bilete dokun: varış gününü zımbala, istersen beş yıldız üzerinden puan ver.</p></li>
+      </ol>
+    </div>
+  </section>
+
+  <section id="neler">
+    <div class="sar">
+      <div class="baslik"><div><div class="etiket soluk">Neler var</div><h2>Peron'da neler yapabilirsin?</h2></div></div>
+      <div class="cizgi-m"></div>
+      <div class="fisler">
+        <article class="fis">
+          <div class="ust-satir"><span>001.1 SER</span><span>SERİLER</span></div>
+          <div class="ic"><h3>Seriler ve hatlar</h3>
+            <p>Bir seriyi kendi okuma sıralarına böl. Her hat kendi renginde ilerler; çok kollu seriler de derli toplu durur.</p>
+            <div class="serit" aria-hidden="true"><i style="--c:var(--hat-r)"></i><i style="--c:var(--hat-r)"></i><i style="--c:var(--hat-c)"></i><i style="--c:var(--hat-t)"></i><i class="bos" style="--c:var(--hat-r)"></i><i class="bos" style="--c:var(--hat-b)"></i><i class="bos" style="--c:var(--hat-k)"></i><i class="bos" style="--c:var(--hat-c)"></i></div>
+          </div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.2 TEK</span><span>TEK KİTAPLAR</span></div>
+          <div class="ic"><h3>Tek kitaplar çekmecesi</h3><p>Seri olmayan kitaplar ayrı bir çekmecede: bitirdiklerin ve peronda sıra bekleyenler bir arada.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.3 BİL</span><span>BİLET</span></div>
+          <div class="ic"><h3>Zımbalı bilet ve puan</h3><p>Her bitirdiğin kitabın bir bileti olur: varış günü, hattı, yayın numarası ve beş yıldızlık puanınla.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.4 YIL</span><span>YIL DAMGASI</span></div>
+          <div class="ic"><h3>Yıl damgası</h3><p>Bu yıl kaç sefer yaptığını ana ekrandaki büyük damga söyler; son bitirdiğin kitap hemen yanında durur.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.5 TÜR</span><span>TÜRLER</span></div>
+          <div class="ic"><h3>Roman, manga, çizgi roman</h3><p>Her fişin türünü seç; kütüphane yer numarası da ona göre basılır.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.6 HES</span><span>YOLCU KARTI</span></div>
+          <div class="ic"><h3>Kayıtların hesabında</h3><p>Apple ile ya da e-postayla giriş yap; okuma kayıtların hesabında saklanır, telefon değişse de kaybolmaz.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.7 GEC</span><span>GECE BASKISI</span></div>
+          <div class="ic"><h3>Gece baskısı</h3><p>Karanlık modda kâğıt koyulaşır, mürekkep açılır. Yatmadan önce de gözünü yormaz.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.8 GİZ</span><span>GİZLİLİK</span></div>
+          <div class="ic"><h3>Reklam yok, izleme yok</h3><p>Peron reklam göstermez, seni izlemez. Hesabını ve tüm kayıtlarını istediğin an uygulamanın içinden silebilirsin.</p></div>
+        </article>
+        <article class="fis">
+          <div class="ust-satir"><span>001.9 DOK</span><span>DOKUNUŞ</span></div>
+          <div class="ic"><h3>Elde hissedilen</h3><p>Zımbaya bastığında telefon hafifçe titrer; kâğıt dokusu ve damgalarla her bilet gerçek bir bilet gibi.</p></div>
+        </article>
+      </div>
+    </div>
+  </section>
+
+  <section id="ekranlar">
+    <div class="sar">
+      <div class="baslik"><div><div class="etiket soluk">Ekranlar</div><h2>Uygulamadan kareler</h2></div></div>
+      <div class="cizgi-m"></div>
+      <div class="ekranlar">
+        <figure><div class="telefon"><picture><source srcset="img/seri-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/seri-light.webp" width="640" height="1391" loading="lazy" alt="Seriler çekmecesi"></picture></div>
+          <figcaption><b>ÇEKMECE</b>Serilerin ve yolculuk şeritlerin.</figcaption></figure>
+        <figure><div class="telefon"><picture><source srcset="img/detay-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/detay-light.webp" width="640" height="1391" loading="lazy" alt="Seri fişi, hatlar görünümü"></picture></div>
+          <figcaption><b>HATLAR</b>Her alt seri kendi renginde bir hat.</figcaption></figure>
+        <figure><div class="telefon"><picture><source srcset="img/yayin-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/yayin-light.webp" width="640" height="1391" loading="lazy" alt="Seri fişi, yayın sırası görünümü"></picture></div>
+          <figcaption><b>SIRADAKİ SEFER</b>Kaldığın yer ve varış damgaları.</figcaption></figure>
+        <figure><div class="telefon"><picture><source srcset="img/kart-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/kart-light.webp" width="640" height="1391" loading="lazy" alt="Kitap bileti: varış günü ve puan"></picture></div>
+          <figcaption><b>BİLET</b>Varış gününü zımbala, puanını ver.</figcaption></figure>
+        <figure><div class="telefon"><picture><source srcset="img/tek-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/tek-light.webp" width="640" height="1391" loading="lazy" alt="Tek kitaplar çekmecesi"></picture></div>
+          <figcaption><b>TEK KİTAPLAR</b>Okunanlar ve peronda bekleyenler.</figcaption></figure>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="sar">
+      <div class="kapanis">
+        <img src="img/icon-light-256.png" alt="Peron simgesi">
+        <h2>Biletin hazır.</h2>
+        <p>Peron iPhone için hazırlanıyor. App Store'a çıktığında buradan indirebileceksin.</p>
+        <div class="indir">
+          <a class="appstore" data-appstore href="#" aria-disabled="true">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.2 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.55zM14.2 6.13c.61-.74 1.02-1.76.9-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.6-1.23z"/></svg>
+            <span data-appstore-yazi>APP STORE'DA YAKINDA</span>
+          </a>
+        </div>
+      </div>
+    </div>
+  </section>
+</main>
+
+<footer>
+  <div class="sar">
+    <span>© 2026 Peron</span>
+    <span>getperon.app</span>
+  </div>
+</footer>
+
+<script>
+  // App Store'a çıkınca yalnızca bu satırı doldur: düğmeler indirme bağlantısına döner.
+  var APP_STORE = '';
+  document.querySelectorAll('[data-appstore]').forEach(function (a) {
+    if (APP_STORE) {
+      a.href = APP_STORE; a.removeAttribute('aria-disabled');
+      a.querySelector('[data-appstore-yazi]').textContent = "APP STORE'DAN İNDİR";
+    } else {
+      a.addEventListener('click', function (e) { e.preventDefault(); });
+    }
+  });
+  if (APP_STORE) document.querySelectorAll('[data-appstore-not]').forEach(function (n) { n.remove(); });
+</script>
+</body>
+</html>
