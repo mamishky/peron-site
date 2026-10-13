@@ -1,0 +1,107 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Peron · Destek</title>
+<meta name="description" content="Peron ile ilgili sık sorulanlar ve iletişim adresi.">
+<meta name="theme-color" content="#f4ecd8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1b17" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../img/icon-180.png">
+<link rel="apple-touch-icon" href="../img/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap">
+<style>
+  :root { --paper:#f4ecd8; --karton:#e3d5b2; --sheet:#fbf6e9; --ink:#2b2721; --ink2:#5e5547; --hair:#cdbf9f; --coral:#e2603f; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 400 19px/1.55 'Crimson Pro', Georgia, serif; }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  a:hover { color: var(--coral); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+  .cift { height: 5px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+  .cift.m { border-width: 1px; border-color: var(--coral); max-width: 440px; }
+  header { padding-top: env(safe-area-inset-top); }
+  .ust { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 12px; }
+  .marka { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .marka img { width: 44px; height: 44px; border-radius: 24%; box-shadow: 0 0 0 1px var(--hair); }
+  .marka span { font-weight: 800; font-size: 24px; letter-spacing: .14em; line-height: 1; }
+  .ust nav { display: flex; gap: 18px; font-weight: 700; font-size: 14px; letter-spacing: .16em; }
+  .ust nav a { text-decoration: none; padding: 10px 0; }
+  .ust nav a[aria-current] { color: var(--coral); }
+  .serit { display: flex; align-items: center; gap: 14px; margin-top: clamp(28px, 5vw, 48px); padding: 10px 14px; background: var(--karton); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+  .serit .no { flex: none; width: 32px; height: 32px; display: grid; place-items: center; background: var(--coral); color: #fbf6e9; font-weight: 800; font-size: 15px; }
+  .serit .ad { font-weight: 700; font-size: 17px; letter-spacing: .18em; }
+  .serit .veri { margin-left: auto; font-size: 13px; color: var(--ink2); }
+  h1 { margin: clamp(28px, 5vw, 44px) 0 18px; font-weight: 600; font-size: clamp(40px, 7vw, 64px); line-height: 1; letter-spacing: -.015em; text-wrap: balance; }
+  .giris { margin: 18px 0 0; font-size: clamp(20px, 2.4vw, 23px); line-height: 1.45; color: var(--ink2); text-wrap: pretty; }
+  section { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 24px 0; border-bottom: 1px solid var(--hair); }
+  section .kod { font-weight: 700; font-size: 14px; color: var(--ink2); padding-top: 7px; }
+  h2 { margin: 0 0 8px; font-weight: 600; font-size: 26px; line-height: 1.15; }
+  section p, section li { color: var(--ink2); text-wrap: pretty; }
+  section p { margin: 0 0 10px; }
+  section ul { margin: 0 0 10px; padding-left: 20px; }
+  section li { margin-bottom: 4px; }
+  b { color: var(--ink); font-weight: 600; }
+  .eposta { display: inline-block; margin-top: 6px; padding: 12px 20px; background: var(--ink); color: var(--paper); text-decoration: none; border-radius: 6px; font-weight: 700; letter-spacing: .04em; }
+  .eposta:hover { background: var(--coral); color: #fbf6e9; }
+  footer .alt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 20px 0 max(36px, env(safe-area-inset-bottom)); font-size: 14px; color: var(--ink2); }
+  main { padding-bottom: clamp(56px, 8vw, 96px); }
+  @media (max-width: 520px) { section { grid-template-columns: 1fr; gap: 4px; } section .kod { padding-top: 0; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap ust">
+    <a class="marka" href="../"><img src="../img/icon-180.png" alt="" width="44" height="44"><span>PERON</span></a>
+    <nav><a href="../gizlilik/">GİZLİLİK</a><a href="../destek/" aria-current="page">DESTEK</a></nav>
+  </div>
+  <div class="wrap"><div class="cift"></div></div>
+</header>
+<main class="wrap">
+  <div class="serit"><span class="no">?</span><span class="ad">DESTEK</span><span class="veri">getperon.app</span></div>
+  <h1>Yardım lazım mı?</h1>
+  <div class="cift m"></div>
+  <p class="giris">Bir sorun mu var ya da bir önerin mi? Bize yaz. Sorunu ve telefonunun modelini yazarsan daha hızlı çözeriz.</p>
+  <p><a class="eposta" href="mailto:destek@getperon.app">destek@getperon.app</a></p>
+  <section><span class="kod">01</span><div>
+    <h2>Üye olmadan kullanabilir miyim?</h2>
+    <p>Evet. Giriş ekranında <b>Üye olmadan gir</b>’e dokun. Kayıtların yalnızca o telefonda durur. Daha sonra üye olursan bu kayıtlar hesabına eklenir.</p>
+  </div></section>
+  <section><span class="kod">02</span><div>
+    <h2>Kayıtlarım yeni telefonuma geçer mi?</h2>
+    <p>Üyeysen geçer. Yeni telefonda aynı hesapla giriş yap, kayıtların geri gelir.</p>
+  </div></section>
+  <section><span class="kod">03</span><div>
+    <h2>Şifremi unuttum</h2>
+    <p>Giriş ekranında e-posta adresini yaz ve <b>Şifremi unuttum</b>’a dokun. Gelen e-postadaki bağlantıdan yeni şifreni belirle. Bağlantı açılmazsa <a href="../sifre/">yeni şifre sayfasından</a> tekrar iste.</p>
+  </div></section>
+  <section><span class="kod">04</span><div>
+    <h2>Onay e-postası gelmedi</h2>
+    <p>İstenmeyen e-postalar klasörüne bak. Orada da yoksa birkaç dakika bekle, sonra aynı e-postayla yeniden üye olmayı dene.</p>
+  </div></section>
+  <section><span class="kod">05</span><div>
+    <h2>Bir seriyi hatlara nasıl bölerim?</h2>
+    <p>Seri fişinde her cildin sağında bir hat etiketi var. Etikete dokun, var olan bir hattı seç ya da <b>Yeni hat</b> aç. Her hat kendi rengini alır.</p>
+  </div></section>
+  <section><span class="kod">06</span><div>
+    <h2>Peron haritası nedir?</h2>
+    <p>Serinin bütün hatlarını bir metro şeması gibi gösterir. Seri sayfasındaki <b>Peron haritası</b> düğmesiyle açılır. Aynı yazardan iki kitap okuduysan tek kitaplar çekmecesinde o yazarın hattı da çıkar.</p>
+  </div></section>
+  <section><span class="kod">07</span><div>
+    <h2>Hesabımı nasıl silerim?</h2>
+    <p>Sağ üstteki <b>yolcu kartı</b> simgesine dokun, sonra <b>Hesabımı sil</b>’e bas. Bütün kayıtların kalıcı olarak silinir. Ayrıntılar için <a href="../gizlilik/">gizlilik politikasına</a> bak.</p>
+  </div></section>
+</main>
+<footer class="wrap">
+  <div class="cift"></div>
+  <div class="alt"><span><a href="../">Peron · getperon.app</a></span><span>© 2026</span></div>
+</footer>
+</body>
+</html>

@@ -1,0 +1,129 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<title>Peron · Gizlilik politikası</title>
+<meta name="description" content="Peron hangi bilgileri saklar, nerede saklar ve hesabını nasıl silersin.">
+<meta name="theme-color" content="#f4ecd8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#1d1b17" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="../img/icon-180.png">
+<link rel="apple-touch-icon" href="../img/icon-180.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap">
+<style>
+  :root { --paper:#f4ecd8; --karton:#e3d5b2; --sheet:#fbf6e9; --ink:#2b2721; --ink2:#5e5547; --hair:#cdbf9f; --coral:#e2603f; color-scheme: light; }
+  @media (prefers-color-scheme: dark) {
+    :root { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; color-scheme: dark; }
+  }
+  * { box-sizing: border-box; }
+  html { -webkit-text-size-adjust: 100%; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font: 400 19px/1.55 'Crimson Pro', Georgia, serif; }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  a:hover { color: var(--coral); }
+  .wrap { max-width: 760px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+  .cift { height: 5px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+  .cift.m { border-width: 1px; border-color: var(--coral); max-width: 440px; }
+  header { padding-top: env(safe-area-inset-top); }
+  .ust { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 12px; }
+  .marka { display: flex; align-items: center; gap: 12px; text-decoration: none; }
+  .marka img { width: 44px; height: 44px; border-radius: 24%; box-shadow: 0 0 0 1px var(--hair); }
+  .marka span { font-weight: 800; font-size: 24px; letter-spacing: .14em; line-height: 1; }
+  .ust nav { display: flex; gap: 18px; font-weight: 700; font-size: 14px; letter-spacing: .16em; }
+  .ust nav a { text-decoration: none; padding: 10px 0; }
+  .ust nav a[aria-current] { color: var(--coral); }
+  .serit { display: flex; align-items: center; gap: 14px; margin-top: clamp(28px, 5vw, 48px); padding: 10px 14px; background: var(--karton); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+  .serit .no { flex: none; width: 32px; height: 32px; display: grid; place-items: center; background: var(--coral); color: #fbf6e9; font-weight: 800; font-size: 15px; }
+  .serit .ad { font-weight: 700; font-size: 17px; letter-spacing: .18em; }
+  .serit .veri { margin-left: auto; font-size: 13px; color: var(--ink2); }
+  h1 { margin: clamp(28px, 5vw, 44px) 0 18px; font-weight: 600; font-size: clamp(40px, 7vw, 64px); line-height: 1; letter-spacing: -.015em; text-wrap: balance; }
+  .giris { margin: 18px 0 0; font-size: clamp(20px, 2.4vw, 23px); line-height: 1.45; color: var(--ink2); text-wrap: pretty; }
+  section { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 24px 0; border-bottom: 1px solid var(--hair); }
+  section .kod { font-weight: 700; font-size: 14px; color: var(--ink2); padding-top: 7px; }
+  h2 { margin: 0 0 8px; font-weight: 600; font-size: 26px; line-height: 1.15; }
+  section p, section li { color: var(--ink2); text-wrap: pretty; }
+  section p { margin: 0 0 10px; }
+  section ul { margin: 0 0 10px; padding-left: 20px; }
+  section li { margin-bottom: 4px; }
+  b { color: var(--ink); font-weight: 600; }
+  .eposta { display: inline-block; margin-top: 6px; padding: 12px 20px; background: var(--ink); color: var(--paper); text-decoration: none; border-radius: 6px; font-weight: 700; letter-spacing: .04em; }
+  .eposta:hover { background: var(--coral); color: #fbf6e9; }
+  footer .alt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 20px 0 max(36px, env(safe-area-inset-bottom)); font-size: 14px; color: var(--ink2); }
+  main { padding-bottom: clamp(56px, 8vw, 96px); }
+  @media (max-width: 520px) { section { grid-template-columns: 1fr; gap: 4px; } section .kod { padding-top: 0; } }
+</style>
+</head>
+<body>
+<header>
+  <div class="wrap ust">
+    <a class="marka" href="../"><img src="../img/icon-180.png" alt="" width="44" height="44"><span>PERON</span></a>
+    <nav><a href="../gizlilik/" aria-current="page">GİZLİLİK</a><a href="../destek/">DESTEK</a></nav>
+  </div>
+  <div class="wrap"><div class="cift"></div></div>
+</header>
+<main class="wrap">
+  <div class="serit"><span class="no">§</span><span class="ad">GİZLİLİK</span><span class="veri">13.10.2026</span></div>
+  <h1>Gizlilik politikası</h1>
+  <div class="cift m"></div>
+  <p class="giris">Peron senin okuma kayıtlarını tutar. Bunun için gereken en az bilgiyi alır. Reklam göstermez, seni izlemez, bilgilerini kimseye satmaz.</p>
+  <section><span class="kod">01</span><div>
+    <h2>Peron’u kim yapıyor</h2>
+    <p>Peron’u Muhammed Faruk Erdoğan geliştiriyor. Bilgilerin konusunda sorumlu kişi odur. Bu sayfada “biz” dediğimizde Peron’u kastediyoruz.</p>
+  </div></section>
+  <section><span class="kod">02</span><div>
+    <h2>Hangi bilgileri alıyoruz</h2>
+    <p>Üye olursan şunları saklarız:</p>
+    <ul>
+      <li><b>E-posta adresin.</b> Giriş yapman ve şifreni yenileyebilmen için.</li>
+      <li><b>Adın.</b> Yolcu kartında görünmesi için. Yazmak zorunda değilsin.</li>
+      <li><b>Okuma kayıtların.</b> Eklediğin seriler, kitaplar, hatlar, varış tarihleri ve puanlar.</li>
+    </ul>
+    <p>Apple ile giriş yaparsan Apple’ın bize verdiği ad ve e-postayı alırız. Apple’da e-postanı gizlemeyi seçtiysen gerçek adresini hiç görmeyiz.</p>
+  </div></section>
+  <section><span class="kod">03</span><div>
+    <h2>Almadığımız bilgiler</h2>
+    <p>Konumunu, rehberini, fotoğraflarını ya da başka uygulamalardaki bilgilerini almayız. Reklam, izleme ya da kullanım ölçümü aracı kullanmayız.</p>
+  </div></section>
+  <section><span class="kod">04</span><div>
+    <h2>Üye olmadan kullanırsan</h2>
+    <p>Kayıtların yalnızca telefonunda durur. Bize hiçbir bilgi gelmez. Uygulamayı silersen bu kayıtlar da silinir.</p>
+  </div></section>
+  <section><span class="kod">05</span><div>
+    <h2>Bilgiler nerede duruyor</h2>
+    <p>Üyelerin kayıtları Supabase’in Frankfurt’taki (Almanya) sunucularında saklanır. Onay ve yeni şifre e-postaları Resend üzerinden gönderilir. Bu iki hizmet bilgilerini yalnızca bizim adımıza işler.</p>
+    <p>Telefonunla sunucu arasındaki bağlantı şifrelidir. Her üye yalnızca kendi kayıtlarını görebilir.</p>
+  </div></section>
+  <section><span class="kod">06</span><div>
+    <h2>Bilgileri ne için kullanıyoruz</h2>
+    <p>Yalnızca hesabını açmak, kayıtlarını saklamak ve telefon değiştirdiğinde onları geri getirmek için. Onay ve yeni şifre e-postaları dışında sana e-posta göndermeyiz.</p>
+  </div></section>
+  <section><span class="kod">07</span><div>
+    <h2>Ne kadar saklıyoruz</h2>
+    <p>Hesabın açık olduğu sürece. Hesabını sildiğinde e-postan, adın ve bütün okuma kayıtların hemen silinir. Bu geri alınamaz.</p>
+  </div></section>
+  <section><span class="kod">08</span><div>
+    <h2>Hesabını silmek</h2>
+    <p>Uygulamada sağ üstteki <b>yolcu kartı</b> simgesine dokun, sonra <b>Hesabımı sil</b>’e bas. Uygulamaya giremiyorsan bize yaz, hesabını biz sileriz.</p>
+  </div></section>
+  <section><span class="kod">09</span><div>
+    <h2>Hakların</h2>
+    <p>Hakkında hangi bilgileri sakladığımızı sorabilir, düzeltilmesini ya da silinmesini isteyebilirsin. Kişisel Verilerin Korunması Kanunu (KVKK) ve Avrupa Birliği veri koruma kuralları (GDPR) sana bu hakları verir. İsteğini <a href="mailto:destek@getperon.app">destek@getperon.app</a> adresine yaz.</p>
+  </div></section>
+  <section><span class="kod">10</span><div>
+    <h2>Çocuklar</h2>
+    <p>Peron 13 yaşından küçük çocuklar için tasarlanmadı. Bu yaştaki birinin bilgilerini sakladığımızı öğrenirsek sileriz.</p>
+  </div></section>
+  <section><span class="kod">11</span><div>
+    <h2>Değişiklikler</h2>
+    <p>Bu politikayı değiştirirsek bu sayfayı güncelleriz. En üstteki tarih son değişikliği gösterir.</p>
+  </div></section>
+</main>
+<footer class="wrap">
+  <div class="cift"></div>
+  <div class="alt"><span><a href="../">Peron · getperon.app</a></span><span>© 2026</span></div>
+</footer>
+</body>
+</html>
