@@ -71,7 +71,7 @@
   .serit { position: relative; display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: var(--karton); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
   .isaret { position: absolute; z-index: 2; left: calc(var(--rail) - var(--gut) - 13px); top: 50%; margin-top: -13px; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); transition: background .3s; }
   .gecti .isaret { background: var(--coral); }
-  .serit .no { width: 32px; height: 32px; display: grid; place-items: center; background: var(--coral); color: #fbf6e9; font-weight: 800; font-size: 15px; }
+  .serit .no { flex: none; width: 32px; height: 32px; display: grid; place-items: center; background: var(--coral); color: #fbf6e9; font-weight: 800; font-size: 15px; }
   .serit .ad { font-weight: 700; font-size: 17px; letter-spacing: .18em; }
   .serit .veri { margin-left: auto; font-size: 13px; color: var(--ink2); }
   .js .ic { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
@@ -90,6 +90,7 @@
   .kalkis .sol { display: flex; flex-direction: column; gap: 26px; }
   .yer { font-size: 14px; color: var(--ink2); letter-spacing: .04em; }
   h1 { margin: 0; font-weight: 600; font-size: clamp(52px, 8.2vw, 108px); line-height: .95; letter-spacing: -.02em; text-wrap: balance; }
+  h1 em { font-style: italic; font-weight: 400; color: var(--coral); }
   .kalkis .cift.m { max-width: 440px; }
   .giris { margin: 0; font-size: clamp(20px, 2.1vw, 24px); line-height: 1.42; max-width: 32ch; color: var(--ink2); text-wrap: pretty; }
   .indir { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding-top: 6px; }
@@ -195,7 +196,7 @@
     <div class="ic kalkis">
       <div class="sol">
         <div class="yer">823.914 PER · OKUMA LİSTESİ · iPHONE</div>
-        <h1>Okuduğun her kitap bir sefer.</h1>
+        <h1>Okuduğun her kitap <em>bir sefer.</em></h1>
         <div class="cift m"></div>
         <p class="giris">Peron, okuma listeni bir kütüphane fişi gibi tutar. Her kitap bir bilet, her seri bir hat. Bitirdiğinde biletini zımbalarsın.</p>
         <div class="indir">
