@@ -8,273 +8,344 @@
     location.replace('sifre/' + location.search + location.hash);
   else if (/(access_token|error_description|error_code)=/.test(location.hash) || /[?&](code|error)=/.test(location.search))
     location.replace('onay/' + location.search + location.hash);
+  document.documentElement.classList.add('js');
 </script>
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Peron · Okuma yolculuğun</title>
-<meta name="description" content="Peron, okuma listeni bir kütüphane fişi ve tren bileti gibi tutan iPhone uygulaması. Serileri hatlara böl, bitirdiğin her kitapta biletini zımbala.">
-<meta name="theme-color" content="#d8c69c" media="(prefers-color-scheme: light)">
+<meta name="color-scheme" content="light dark">
+<title>Peron · Okuduğun her kitap bir sefer</title>
+<meta name="description" content="Peron, okuma listeni bir kütüphane fişi ve tren bileti gibi tutan iPhone uygulaması. Her kitap bir bilet, her seri bir hat; bitirdiğinde biletini zımbalarsın.">
+<meta name="theme-color" content="#f4ecd8" media="(prefers-color-scheme: light)">
 <meta name="theme-color" content="#1d1b17" media="(prefers-color-scheme: dark)">
-<meta property="og:title" content="Peron · Okuma yolculuğun">
-<meta property="og:description" content="Okuduğun her kitap bir sefer. Serileri hatlara böl, bitirdiğinde biletini zımbala.">
+<meta property="og:title" content="Peron · Okuduğun her kitap bir sefer">
+<meta property="og:description" content="Her kitap bir bilet, her seri bir hat. Bitirdiğinde biletini zımbalarsın.">
 <meta property="og:image" content="https://getperon.app/img/icon-512.png">
 <meta property="og:url" content="https://getperon.app/">
-<link rel="icon" href="img/icon-512.png">
+<link rel="icon" href="img/icon-180.png">
 <link rel="apple-touch-icon" href="img/icon-180.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@600;700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap">
 <style>
-  :root {
-    --kagit: #f4ecd8; --kagit-acik: #fbf5e6; --cekmece: #d8c69c; --cekmece-koyu: #c4ae80;
-    --murekkep: #2b2721; --soluk: #6e6350; --mercan: #e2603f; --mercan-metin: #b04428;
-    --kart-kenar: rgba(43, 39, 33, .2); --kenar-soluk: rgba(43, 39, 33, .35);
-    --cta: #2b2721; --cta-metin: #f4ecd8;
-    --gren: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0.35 0 0 0 0 0.28 0 0 0 0 0.18 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-    --gren-op: .45;
-    --f-etiket: 'Archivo Narrow', 'Arial Narrow', sans-serif;
-    --f-eser: 'Crimson Pro', Georgia, serif;
-    --f-veri: 'Courier Prime', 'Courier New', monospace;
-    --hat-r: #d9a21b; --hat-c: #2f7d50; --hat-t: #4b98c4; --hat-b: #2c4f9b; --hat-k: #a6435c;
-  }
+  :root { --paper:#f4ecd8; --karton:#e3d5b2; --sheet:#fbf6e9; --ink:#2b2721; --ink2:#5e5547; --hair:#cdbf9f; --coral:#e2603f; --onink:#f4ecd8; --l:block; --d:none; color-scheme: light; }
   @media (prefers-color-scheme: dark) {
-    :root {
-      --kagit: #28241e; --kagit-acik: #2e2a23; --cekmece: #1d1b17; --cekmece-koyu: #141310;
-      --murekkep: #e8dfca; --soluk: #9a8f79; --mercan-metin: #e2603f;
-      --kart-kenar: rgba(232, 223, 202, .15); --kenar-soluk: rgba(232, 223, 202, .3);
-      --cta: #e2603f; --cta-metin: #1d1b17;
-      --gren: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='220' height='220'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 0.96 0 0 0 0 0.88 0 0 0 0.5 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-      --gren-op: .12;
-      --hat-r: #f0bd3a; --hat-c: #5fb784; --hat-t: #7cc0e6; --hat-b: #7a9be0; --hat-k: #dd7c95;
-    }
+    :root:not([data-theme="light"]) { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; --onink:#1d1b17; --l:none; --d:block; color-scheme: dark; }
   }
+  :root[data-theme="dark"] { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; --onink:#1d1b17; --l:none; --d:block; color-scheme: dark; }
+
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
-  body { margin: 0; background: var(--cekmece); color: var(--murekkep); font: 400 16px/1.55 var(--f-veri); overflow-x: hidden; }
-  body::before { content: ""; position: fixed; inset: 0; pointer-events: none; z-index: 50; background-image: var(--gren); opacity: var(--gren-op); }
-  img { display: block; max-width: 100%; }
-  a { color: inherit; }
-  .sar { max-width: 1080px; margin: 0 auto; padding: 0 16px; }
-  .etiket { font: 700 12px/1.3 var(--f-etiket); letter-spacing: .22em; text-transform: uppercase; }
-  .soluk { color: var(--soluk); }
-  .cift { border-top: 1.5px solid var(--murekkep); border-bottom: 1.5px solid var(--murekkep); height: 5px; }
+  html, body { margin: 0; background: var(--paper); color: var(--ink); }
+  body { font-family: 'Crimson Pro', Georgia, serif; min-height: 100vh; overflow-x: hidden; }
+  a { color: var(--ink); text-underline-offset: 3px; }
+  a:hover { color: var(--coral); }
+  img { display: block; }
+  .l { display: var(--l) !important; } .d { display: var(--d) !important; }
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 0 clamp(20px, 4vw, 48px); }
+  .cift { height: 5px; border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+  .cift.m { border-width: 1px; border-color: var(--coral); }
 
   /* Üst */
-  header { padding: max(14px, env(safe-area-inset-top)) 0 0; }
-  .ust { display: flex; align-items: center; justify-content: space-between; gap: 12px; padding-bottom: 10px; }
-  .marka { display: flex; align-items: center; gap: 10px; text-decoration: none; font: 700 16px var(--f-etiket); letter-spacing: .26em; }
-  .marka img { width: 30px; height: 30px; border-radius: 7px; }
-  .ust .veri { font-size: 13px; }
+  header { position: sticky; top: 0; z-index: 20; background: var(--paper); padding-top: env(safe-area-inset-top); }
+  .ust { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding-top: 14px; padding-bottom: 12px; }
+  .marka { display: flex; align-items: center; gap: 14px; text-decoration: none; }
+  .marka img { width: clamp(44px, 5vw, 56px); height: clamp(44px, 5vw, 56px); border-radius: 24%; box-shadow: 0 0 0 1px var(--hair); }
+  .marka span { font-weight: 800; font-size: clamp(24px, 2.8vw, 30px); letter-spacing: .14em; line-height: 1; }
+  .durum { display: flex; align-items: center; gap: 18px; }
+  .durum > div { display: flex; flex-direction: column; gap: 3px; }
+  .durum .k { font-size: 12px; letter-spacing: .06em; color: var(--ink2); }
+  .durum .b { font-weight: 700; font-size: 15px; letter-spacing: .16em; }
+  .durum .simdi { align-items: flex-end; }
+  .durum .sonra { padding-left: 18px; border-left: 1.5px solid var(--hair); }
+  .durum .sonra .b { color: var(--coral); }
+  .durum .sonra[hidden] { display: none; }
+  @media (max-width: 679px) { .durum .sonra { display: none; } }
 
-  /* Giriş */
-  .giris { display: grid; grid-template-columns: 1.1fr .9fr; gap: 40px; align-items: center; padding: 56px 0 64px; }
-  .giris h1 { font: 600 clamp(44px, 7vw, 76px)/1.02 var(--f-eser); margin: 14px 0 18px; letter-spacing: -.01em; }
-  .giris h1 em { font-style: italic; font-weight: 400; color: var(--mercan-metin); }
-  .giris p.on { font: 400 20px/1.5 var(--f-eser); margin: 0 0 28px; max-width: 34em; }
-  .indir { display: flex; flex-wrap: wrap; align-items: center; gap: 14px 18px; }
-  .appstore { display: inline-flex; align-items: center; gap: 10px; min-height: 56px; padding: 0 22px; background: var(--cta); color: var(--cta-metin);
-              text-decoration: none; font: 700 15px var(--f-etiket); letter-spacing: .14em; border: 0; }
-  .appstore svg { width: 22px; height: 22px; fill: currentColor; }
-  .appstore[aria-disabled="true"] { cursor: default; }
-  .indir small { font-size: 13px; color: var(--soluk); max-width: 22em; }
+  /* Ray */
+  main { --pad: clamp(20px, 4vw, 48px); --rail: clamp(12px, 2.4vw, 30px); --gut: calc(var(--rail) + clamp(28px, 4.6vw, 64px));
+         position: relative; max-width: 1200px; margin: 0 auto; padding: 0 var(--pad) 0 calc(var(--pad) + var(--gut)); }
+  .ray { position: absolute; z-index: 1; top: 120px; height: 0; left: calc(var(--pad) + var(--rail) - 2px); width: 4px; background: var(--hair); }
+  .ray-dolu { position: relative; width: 100%; height: 0; background: var(--coral); }
+  .ray-dolu::after { content: ""; position: absolute; left: 50%; bottom: -7px; width: 14px; height: 14px; margin-left: -7px; border-radius: 50%; background: var(--coral); box-shadow: 0 0 0 4px var(--paper); }
 
-  .telefon-alani { position: relative; display: flex; justify-content: center; }
-  .telefon { width: min(300px, 78vw); border-radius: 38px; padding: 9px; background: #121110; box-shadow: 0 24px 50px rgba(0,0,0,.25), 0 0 0 1px rgba(0,0,0,.4); }
-  .telefon img { width: 100%; border-radius: 30px; }
-  .giris .telefon { transform: rotate(2.5deg); }
-  .damga { position: absolute; left: 0; bottom: 12%; padding: 6px 14px; transform: rotate(-9deg);
-           font: 700 22px var(--f-veri); letter-spacing: .12em; color: var(--mercan); background: color-mix(in srgb, var(--kagit) 85%, transparent);
-           border: 3px solid var(--mercan); outline: 1px solid var(--mercan); outline-offset: 3px; }
-
-  /* Bölümler */
-  section { padding: 60px 0; }
-  .baslik { display: flex; align-items: baseline; justify-content: space-between; gap: 12px; margin-bottom: 8px; }
-  .baslik h2 { font: 600 clamp(32px, 4.6vw, 46px)/1.1 var(--f-eser); margin: 8px 0 0; }
-  .cizgi-m { border-top: 1.5px solid var(--mercan); margin: 14px 0 28px; }
-
-  /* Nasıl çalışır: biletler */
-  .adimlar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 16px; list-style: none; padding: 0; margin: 0; }
-  .bilet { position: relative; background: var(--kagit-acik); border: 1px solid var(--kart-kenar); padding: 18px 20px 20px 20px; }
-  .bilet::after { content: ""; position: absolute; right: 14px; top: 16px; width: 18px; height: 18px; border-radius: 50%; border: 1.5px dashed var(--kenar-soluk); }
-  .bilet .no { font: 700 13px var(--f-veri); color: var(--mercan-metin); }
-  .bilet h3 { font: 600 26px/1.15 var(--f-eser); margin: 6px 0 6px; }
-  .bilet p { margin: 0; font-size: 15px; }
-
-  /* Özellikler: katalog fişleri */
-  .fisler { display: grid; grid-template-columns: repeat(3, 1fr); gap: 14px; }
-  .fis { background: var(--kagit); border: 1px solid var(--kart-kenar); }
-  .fis .ust-satir { display: flex; justify-content: space-between; padding: 8px 14px 6px; border-bottom: 1.5px solid var(--mercan); font-size: 12px; color: var(--soluk); }
-  .fis .ic { padding: 12px 14px 16px; }
-  .fis h3 { font: 600 24px/1.15 var(--f-eser); margin: 0 0 6px; }
-  .fis p { margin: 0; font-size: 14.5px; }
-  .serit { display: flex; gap: 3px; margin-top: 12px; }
-  .serit i { flex: 1; height: 7px; background: var(--c); opacity: .9; }
-  .serit i.bos { opacity: .25; }
-
-  /* Ekranlar */
-  .ekranlar { display: grid; grid-auto-flow: column; grid-auto-columns: min(230px, 62vw); gap: 22px; overflow-x: auto; padding: 6px 4px 22px;
-              scroll-snap-type: x mandatory; -webkit-overflow-scrolling: touch; }
-  .ekranlar figure { margin: 0; scroll-snap-align: start; }
-  .ekranlar .telefon { width: 100%; border-radius: 30px; padding: 7px; }
-  .ekranlar .telefon img { border-radius: 24px; }
-  .ekranlar figcaption { margin-top: 12px; font-size: 14px; }
-  .ekranlar figcaption b { display: block; font: 700 12px var(--f-etiket); letter-spacing: .18em; }
-
-  /* Kapanış */
-  .kapanis { background: var(--kagit); border: 1.5px solid var(--murekkep); padding: 34px 24px; text-align: center; }
-  .kapanis img { width: 88px; height: 88px; border-radius: 20px; margin: 0 auto 14px; }
-  .kapanis h2 { font: 600 clamp(30px, 4.4vw, 42px)/1.1 var(--f-eser); margin: 0 0 10px; }
-  .kapanis p { margin: 0 auto 22px; max-width: 30em; }
-  .kapanis .indir { justify-content: center; }
-
-  footer { padding: 36px 0 max(36px, env(safe-area-inset-bottom)); font-size: 13px; color: var(--soluk); }
-  footer .sar { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 8px; }
-
-  @media (max-width: 860px) {
-    .giris { grid-template-columns: 1fr; padding: 36px 0 48px; gap: 36px; }
-    .adimlar, .fisler { grid-template-columns: 1fr; }
-    .damga { left: 4%; }
-    section { padding: 44px 0; }
+  section { padding-bottom: clamp(80px, 10vw, 136px); scroll-margin-top: 100px; }
+  .serit { position: relative; display: flex; align-items: center; gap: 14px; padding: 10px 14px; background: var(--karton); border-top: 1.5px solid var(--ink); border-bottom: 1.5px solid var(--ink); }
+  .isaret { position: absolute; z-index: 2; left: calc(var(--rail) - var(--gut) - 13px); top: 50%; margin-top: -13px; width: 26px; height: 26px; border-radius: 50%; border: 3px solid var(--ink); background: var(--paper); transition: background .3s; }
+  .gecti .isaret { background: var(--coral); }
+  .serit .no { width: 32px; height: 32px; display: grid; place-items: center; background: var(--coral); color: #fbf6e9; font-weight: 800; font-size: 15px; }
+  .serit .ad { font-weight: 700; font-size: 17px; letter-spacing: .18em; }
+  .serit .veri { margin-left: auto; font-size: 13px; color: var(--ink2); }
+  .js .ic { opacity: 0; transform: translateY(28px); transition: opacity .7s ease, transform .7s ease; }
+  .js .gecti .ic { opacity: 1; transform: none; }
+  @media (prefers-reduced-motion: reduce) {
+    html { scroll-behavior: auto; }
+    .js .ic { opacity: 1; transform: none; transition: none; }
+    .isaret { transition: none; }
   }
-  @media (min-width: 861px) and (max-width: 1020px) { .fisler { grid-template-columns: repeat(2, 1fr); } }
+
+  h2 { margin: 0; font-weight: 600; font-size: clamp(36px, 4.6vw, 56px); line-height: 1.02; letter-spacing: -.015em; text-wrap: balance; }
+
+  /* 01 Kalkış */
+  #kalkis { padding-top: clamp(36px, 5vw, 56px); }
+  .kalkis { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 420px), 1fr)); gap: clamp(48px, 6vw, 80px); align-items: center; padding-top: clamp(40px, 6vw, 72px); }
+  .kalkis .sol { display: flex; flex-direction: column; gap: 26px; }
+  .yer { font-size: 14px; color: var(--ink2); letter-spacing: .04em; }
+  h1 { margin: 0; font-weight: 600; font-size: clamp(52px, 8.2vw, 108px); line-height: .95; letter-spacing: -.02em; text-wrap: balance; }
+  .kalkis .cift.m { max-width: 440px; }
+  .giris { margin: 0; font-size: clamp(20px, 2.1vw, 24px); line-height: 1.42; max-width: 32ch; color: var(--ink2); text-wrap: pretty; }
+  .indir { display: flex; flex-wrap: wrap; align-items: center; gap: 18px; padding-top: 6px; }
+  .appstore { display: flex; flex-direction: column; gap: 2px; padding: 12px 26px 13px; background: var(--ink); color: var(--onink); text-decoration: none; border-radius: 6px; }
+  .appstore .k { font-weight: 600; font-size: 12px; letter-spacing: .18em; }
+  .appstore .b { font-weight: 700; font-size: 21px; letter-spacing: .04em; }
+  a.appstore:hover { background: var(--coral); color: #fbf6e9; }
+  .appstore[aria-disabled="true"], .bilet-dugme[aria-disabled="true"] { cursor: default; }
+  .basla { font-weight: 700; font-size: 15px; letter-spacing: .16em; text-decoration: none; padding: 12px 0; }
+  .vitrin { display: flex; justify-content: center; align-items: flex-start; }
+  .vitrin .tel-sar { width: min(44%, 220px); transform: rotate(-3deg); }
+  .vitrin .tel-sar + .tel-sar { margin-left: -5%; margin-top: 16%; transform: rotate(3deg); position: relative; }
+
+  /* iPhone çerçevesi */
+  .tel { position: relative; width: 100%; padding: 3.4%; background: #121212; border-radius: 15% / 7%; box-shadow: 0 0 0 1.5px #4a4743, 0 30px 50px -28px rgba(0,0,0,.6); }
+  .tel > i { position: absolute; width: 3px; background: #4a4743; }
+  .tel > i:nth-child(1) { left: -3px; top: 18%; height: 6%; border-radius: 2px 0 0 2px; }
+  .tel > i:nth-child(2) { left: -3px; top: 27%; height: 6%; border-radius: 2px 0 0 2px; }
+  .tel > i:nth-child(3) { right: -3px; top: 24%; height: 10%; border-radius: 0 2px 2px 0; }
+  .ekran { position: relative; aspect-ratio: 640 / 1392; border-radius: 12% / 5.6%; overflow: hidden; background: #000; }
+  .ekran img { width: 100%; height: 100%; object-fit: cover; }
+  .ekran::after { content: ""; position: absolute; top: 2.1%; left: 50%; width: 31%; height: 3%; transform: translateX(-50%); background: #000; border-radius: 99px; }
+
+  /* 02 Nasıl çalışır */
+  #nasil h2 { padding: clamp(36px, 5vw, 56px) 0 clamp(32px, 4vw, 48px); }
+  .adimlar { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 250px), 1fr)); gap: 36px 0; }
+  .adimlar li { display: flex; flex-direction: column; gap: 14px; padding-right: 28px; }
+  .adimlar li:last-child { padding-right: 0; }
+  .hat { display: flex; align-items: center; }
+  .hat b { flex: 0 0 auto; width: 20px; height: 20px; border-radius: 50%; background: var(--coral); border: 2.5px solid var(--ink); }
+  .hat i { flex: 1; height: 4px; background: var(--hair); margin-right: -28px; }
+  .hat i.m { background: var(--coral); }
+  .hat b.bos { background: var(--paper); border-color: var(--coral); }
+  .kod { font-weight: 700; font-size: 14px; color: var(--ink2); }
+  .adimlar h3 { margin: 0; font-weight: 600; font-size: 30px; line-height: 1.1; }
+  .adimlar p { margin: 0; font-size: 19px; line-height: 1.45; color: var(--ink2); max-width: 30ch; text-wrap: pretty; }
+
+  /* 03 Neler var */
+  #neler h2 { padding: clamp(36px, 5vw, 56px) 0 clamp(20px, 3vw, 32px); }
+  .fisler { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 440px), 1fr)); column-gap: clamp(32px, 5vw, 64px); }
+  .fis { display: grid; grid-template-columns: 64px 1fr; gap: 16px; padding: 24px 0; border-bottom: 1px solid var(--hair); }
+  .fis .kod { padding-top: 6px; }
+  .fis > div { display: flex; flex-direction: column; gap: 8px; }
+  .fis h3 { margin: 0; font-weight: 600; font-size: 26px; line-height: 1.1; }
+  .fis p { margin: 0; font-size: 18px; line-height: 1.45; color: var(--ink2); text-wrap: pretty; }
+  .renkler { display: flex; gap: 3px; padding-top: 4px; }
+  .renkler span { width: 16px; height: 8px; background: var(--hair); }
+  .damga-k { align-self: flex-start; font-weight: 700; font-size: 13px; letter-spacing: .08em; color: var(--coral); border: 1.5px solid var(--coral); padding: 3px 8px; transform: rotate(-3deg); margin-top: 4px; }
+
+  /* 04 Ekranlar */
+  .ekr-bas { display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 20px; padding: clamp(36px, 5vw, 56px) 0 clamp(28px, 4vw, 40px); }
+  .secim { display: flex; border: 1.5px solid var(--ink); }
+  .secim button { appearance: none; border: 0; cursor: pointer; padding: 11px 18px; min-height: 44px; font: 700 14px 'Crimson Pro', Georgia, serif; letter-spacing: .16em; background: transparent; color: var(--ink); }
+  .secim button + button { border-left: 1.5px solid var(--ink); }
+  .secim button[aria-pressed="true"] { background: var(--ink); color: var(--onink); }
+  .galeri { --ara: clamp(20px, 2.6vw, 32px); display: flex; gap: var(--ara); overflow-x: auto; scroll-snap-type: x mandatory; padding: 8px 6px 20px; margin: 0 -6px; }
+  .galeri figure { flex: 0 0 max(170px, calc((100% - 4 * var(--ara)) / 5)); max-width: 200px; margin: 0; display: flex; flex-direction: column; gap: 16px; scroll-snap-align: start; }
+  .galeri .tel { box-shadow: 0 0 0 1.5px #4a4743, 0 24px 40px -26px rgba(0,0,0,.55); }
+  .galeri figcaption { display: flex; flex-direction: column; gap: 2px; }
+  .galeri figcaption span { font-size: 13px; color: var(--ink2); }
+  .galeri figcaption b { font-size: 19px; font-weight: 600; line-height: 1.2; }
+
+  /* 05 Varış */
+  #varis { padding-bottom: clamp(72px, 9vw, 120px); }
+  .varis { padding-top: clamp(40px, 6vw, 72px); display: flex; justify-content: center; }
+  .bilet { width: 100%; max-width: 860px; display: flex; flex-wrap: wrap; background: var(--sheet); border: 1.5px solid var(--ink); transform: rotate(-1deg); box-shadow: 0 24px 44px -30px rgba(0,0,0,.5); }
+  .bilet .gov { flex: 1 1 360px; padding: clamp(24px, 4vw, 40px); display: flex; flex-direction: column; gap: 20px; }
+  .bilet .ust-s { display: flex; justify-content: space-between; gap: 12px; font-weight: 700; font-size: 14px; letter-spacing: .2em; }
+  .bilet .ust-s span + span { font-weight: 400; letter-spacing: .04em; color: var(--ink2); }
+  .bilet h2 { font-size: clamp(36px, 4.6vw, 54px); line-height: 1; }
+  .bilet .damga { align-self: flex-start; font-weight: 700; font-size: 15px; letter-spacing: .1em; color: var(--coral); border: 2px solid var(--coral); padding: 6px 12px; transform: rotate(-4deg); }
+  .kocan { flex: 1 1 240px; border-left: 2px dashed var(--ink); padding: clamp(24px, 4vw, 40px); display: flex; flex-direction: column; justify-content: center; align-items: flex-start; gap: 16px; position: relative; }
+  .kocan::before { content: ""; position: absolute; top: 18px; right: 18px; width: 26px; height: 26px; border-radius: 50%; border: 1.5px solid var(--ink); background: var(--paper); }
+  .kocan > span { font-size: 14px; color: var(--ink2); }
+  .bilet-dugme { display: block; padding: 15px 22px; background: var(--coral); color: #fbf6e9; text-decoration: none; font-weight: 700; font-size: 17px; letter-spacing: .16em; }
+  a.bilet-dugme:hover { background: var(--ink); color: var(--onink); }
+  @media (max-width: 640px) { .kocan { border-left: 0; border-top: 2px dashed var(--ink); } }
+
+  footer .alt { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 12px; padding: 20px 0 max(36px, env(safe-area-inset-bottom)); font-size: 14px; color: var(--ink2); }
 </style>
 </head>
 <body>
 <header>
-  <div class="sar">
-    <div class="ust">
-      <a class="marka" href="./"><img src="img/icon-180.png" alt="">PERON</a>
-      <span class="veri">OKUMA DEFTERİ · iPHONE</span>
+  <div class="wrap ust">
+    <a class="marka" href="#kalkis">
+      <img class="l" src="img/icon-light-256.png" alt="" width="56" height="56">
+      <img class="d" src="img/icon-dark-256.png" alt="" width="56" height="56">
+      <span>PERON</span>
+    </a>
+    <div class="durum" aria-live="polite">
+      <div class="simdi"><span class="k">PERON <span data-no>01</span> / 05</span><span class="b" data-simdi>KALKIŞ</span></div>
+      <div class="sonra" data-sonra><span class="k">SIRADAKİ DURAK</span><span class="b"><span data-sonraki>NASIL ÇALIŞIR</span> →</span></div>
     </div>
-    <div class="cift"></div>
   </div>
+  <div class="wrap"><div class="cift"></div></div>
 </header>
 
 <main>
-  <div class="sar giris">
-    <div>
-      <div class="etiket soluk">Kütüphane fişi + tren bileti</div>
-      <h1>Okuduğun her kitap <em>bir sefer.</em></h1>
-      <p class="on">Peron, okuma listeni bir kütüphane fişi ve tren bileti gibi tutar. Serileri hatlara böl, sıradaki kitabını gör, bitirdiğinde biletini zımbala. Yılın sonunda da ne kadar yol aldığına bak.</p>
-      <div class="indir">
-        <a class="appstore" data-appstore href="#" aria-disabled="true">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.2 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.55zM14.2 6.13c.61-.74 1.02-1.76.9-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.6-1.23z"/></svg>
-          <span data-appstore-yazi>APP STORE'DA YAKINDA</span>
-        </a>
-        <small data-appstore-not>Şu an TestFlight'ta deneniyor. App Store'a çıktığında indirme bağlantısı burada olacak.</small>
-      </div>
-    </div>
-    <div class="telefon-alani">
-      <div class="telefon">
-        <picture>
-          <source srcset="img/seri-dark.webp" media="(prefers-color-scheme: dark)">
-          <img src="img/seri-light.webp" width="640" height="1391" alt="Peron ana ekranı: yıl damgası, son sefer ve seriler çekmecesi">
-        </picture>
-      </div>
-      <div class="damga" aria-hidden="true">18 SEFER</div>
-    </div>
-  </div>
+  <div class="ray" data-ray><div class="ray-dolu" data-dolu></div></div>
 
-  <section id="nasil">
-    <div class="sar">
-      <div class="baslik"><div><div class="etiket soluk">Nasıl çalışır</div><h2>Üç adımda yolculuk</h2></div></div>
-      <div class="cizgi-m"></div>
+  <section id="kalkis" data-durak="KALKIŞ">
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">01</span><span class="ad">KALKIŞ</span><span class="veri">getperon.app</span></div>
+    <div class="ic kalkis">
+      <div class="sol">
+        <div class="yer">823.914 PER · OKUMA LİSTESİ · iPHONE</div>
+        <h1>Okuduğun her kitap bir sefer.</h1>
+        <div class="cift m"></div>
+        <p class="giris">Peron, okuma listeni bir kütüphane fişi gibi tutar. Her kitap bir bilet, her seri bir hat. Bitirdiğinde biletini zımbalarsın.</p>
+        <div class="indir">
+          <a class="appstore" data-appstore href="#" aria-disabled="true">
+            <span class="k">iPHONE İÇİN</span>
+            <span class="b" data-yazi="App Store'dan indir">App Store'da yakında</span>
+          </a>
+          <a class="basla" href="#nasil">SEFERE BAŞLA ↓</a>
+        </div>
+      </div>
+      <div class="vitrin">
+        <div class="tel-sar">
+          <div class="tel"><i></i><i></i><i></i><div class="ekran">
+            <img class="l" src="img/seri-light.webp" alt="Peron ana ekranı: yıl damgası ve seriler" width="640" height="1392">
+            <img class="d" src="img/seri-dark.webp" alt="Peron ana ekranı, gece baskısı" width="640" height="1392">
+          </div></div>
+        </div>
+        <div class="tel-sar">
+          <div class="tel"><i></i><i></i><i></i><div class="ekran">
+            <img class="l" src="img/kart-light.webp" alt="Zımbalı bilet: varış günü ve puan" width="640" height="1392">
+            <img class="d" src="img/kart-dark.webp" alt="Zımbalı bilet, gece baskısı" width="640" height="1392">
+          </div></div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section id="nasil" data-durak="NASIL ÇALIŞIR">
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">02</span><span class="ad">NASIL ÇALIŞIR</span><span class="veri">3 durak</span></div>
+    <div class="ic">
+      <h2>Kalkıştan varışa üç adım.</h2>
       <ol class="adimlar">
-        <li class="bilet"><div class="no">01 · FİŞ AÇ</div><h3>Kitabını ekle</h3><p>Okuduğun ya da okumak istediğin bir seriyi veya tek kitabı ekle. Seri için başlıkları sırayla yazman yeterli.</p></li>
-        <li class="bilet"><div class="no">02 · YOLA ÇIK</div><h3>Sıradaki sefer</h3><p>Peron seride kaldığın yeri hatırlar; sıradaki kitabın her zaman en üstte seni bekler.</p></li>
-        <li class="bilet"><div class="no">03 · ZIMBALA</div><h3>Biletini zımbala</h3><p>Kitabı bitirince bilete dokun: varış gününü zımbala, istersen beş yıldız üzerinden puan ver.</p></li>
+        <li>
+          <div class="hat" aria-hidden="true"><b></b><i class="m"></i></div>
+          <span class="kod">DURAK 01</span>
+          <h3>Kitabını ekle</h3>
+          <p>Seri mi, tek kitap mı? Adını, yazarını ve türünü yaz, Peron kitabın fişini açar.</p>
+        </li>
+        <li>
+          <div class="hat" aria-hidden="true"><b></b><i></i></div>
+          <span class="kod">DURAK 02</span>
+          <h3>Sıradaki sefer</h3>
+          <p>Peron sırayı bilir. Hattın bir sonraki durağı, seri fişinin en üstünde seni bekler.</p>
+        </li>
+        <li>
+          <div class="hat" aria-hidden="true"><b class="bos"></b></div>
+          <span class="kod">DURAK 03 · VARIŞ</span>
+          <h3>Biletini zımbala</h3>
+          <p>Bitirince biletini zımbala. Varış günü ve puanın bilete basılır, yıl damgasına bir sefer eklenir.</p>
+        </li>
       </ol>
     </div>
   </section>
 
-  <section id="neler">
-    <div class="sar">
-      <div class="baslik"><div><div class="etiket soluk">Neler var</div><h2>Peron'da neler yapabilirsin?</h2></div></div>
-      <div class="cizgi-m"></div>
+  <section id="neler" data-durak="NELER VAR">
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">03</span><span class="ad">NELER VAR</span><span class="veri">7 fiş</span></div>
+    <div class="ic">
+      <h2>Yolculuk boyunca yanında.</h2>
       <div class="fisler">
-        <article class="fis">
-          <div class="ust-satir"><span>001.1 SER</span><span>SERİLER</span></div>
-          <div class="ic"><h3>Seriler ve hatlar</h3>
-            <p>Bir seriyi kendi okuma sıralarına böl. Her hat kendi renginde ilerler; çok kollu seriler de derli toplu durur.</p>
-            <div class="serit" aria-hidden="true"><i style="--c:var(--hat-r)"></i><i style="--c:var(--hat-r)"></i><i style="--c:var(--hat-c)"></i><i style="--c:var(--hat-t)"></i><i class="bos" style="--c:var(--hat-r)"></i><i class="bos" style="--c:var(--hat-b)"></i><i class="bos" style="--c:var(--hat-k)"></i><i class="bos" style="--c:var(--hat-c)"></i></div>
-          </div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.2 TEK</span><span>TEK KİTAPLAR</span></div>
-          <div class="ic"><h3>Tek kitaplar çekmecesi</h3><p>Seri olmayan kitaplar ayrı bir çekmecede: bitirdiklerin ve peronda sıra bekleyenler bir arada.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.3 BİL</span><span>BİLET</span></div>
-          <div class="ic"><h3>Zımbalı bilet ve puan</h3><p>Her bitirdiğin kitabın bir bileti olur: varış günü, hattı, yayın numarası ve beş yıldızlık puanınla.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.4 YIL</span><span>YIL DAMGASI</span></div>
-          <div class="ic"><h3>Yıl damgası</h3><p>Bu yıl kaç sefer yaptığını ana ekrandaki büyük damga söyler; son bitirdiğin kitap hemen yanında durur.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.5 TÜR</span><span>TÜRLER</span></div>
-          <div class="ic"><h3>Roman, manga, çizgi roman</h3><p>Her fişin türünü seç; kütüphane yer numarası da ona göre basılır.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.6 HES</span><span>YOLCU KARTI</span></div>
-          <div class="ic"><h3>Kayıtların hesabında</h3><p>Apple ile ya da e-postayla giriş yap; okuma kayıtların hesabında saklanır, telefon değişse de kaybolmaz.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.7 GEC</span><span>GECE BASKISI</span></div>
-          <div class="ic"><h3>Gece baskısı</h3><p>Karanlık modda kâğıt koyulaşır, mürekkep açılır. Yatmadan önce de gözünü yormaz.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.8 GİZ</span><span>GİZLİLİK</span></div>
-          <div class="ic"><h3>Reklam yok, izleme yok</h3><p>Peron reklam göstermez, seni izlemez. Hesabını ve tüm kayıtlarını istediğin an uygulamanın içinden silebilirsin.</p></div>
-        </article>
-        <article class="fis">
-          <div class="ust-satir"><span>001.9 DOK</span><span>DOKUNUŞ</span></div>
-          <div class="ic"><h3>Elde hissedilen</h3><p>Zımbaya bastığında telefon hafifçe titrer; kâğıt dokusu ve damgalarla her bilet gerçek bir bilet gibi.</p></div>
-        </article>
+        <div class="fis"><span class="kod">823.01</span><div>
+          <h3>Seriler ve renkli hatlar</h3>
+          <p>Uzun bir seriyi kendi okuma sıralarına böl. Her sıra ayrı renkte bir hat, yayın sırası da elinin altında.</p>
+          <div class="renkler" aria-hidden="true"><span style="background:#d9a521"></span><span style="background:#2e7d4f"></span><span style="background:#b5455f"></span><span style="background:#2f55a4"></span><span></span><span></span></div>
+        </div></div>
+        <div class="fis"><span class="kod">823.02</span><div>
+          <h3>Tek kitaplar çekmecesi</h3>
+          <p>Seriye bağlı olmayan kitaplar tek çekmecede: okunanlar zımbalı, okunacaklar peronda bekler.</p>
+        </div></div>
+        <div class="fis"><span class="kod">823.03</span><div>
+          <h3>Zımbalı bilet</h3>
+          <p>Her biten kitabın bir bileti olur: varış günü ve beş yıldız üzerinden puanın.</p>
+          <span class="damga-k" aria-hidden="true">○ 20 MAY 2026</span>
+        </div></div>
+        <div class="fis"><span class="kod">823.04</span><div>
+          <h3>Yıl damgası</h3>
+          <p>Bu yıl kaç sefer yaptığını ana ekrandaki kırmızı damga söyler.</p>
+        </div></div>
+        <div class="fis"><span class="kod">823.05</span><div>
+          <h3>Roman, manga, çizgi roman</h3>
+          <p>Her kitabın türünü seç: roman, manga ya da çizgi roman. Hepsi aynı listede.</p>
+        </div></div>
+        <div class="fis"><span class="kod">823.06</span><div>
+          <h3>Kayıtlar hesabında</h3>
+          <p>Apple ya da e-postayla giriş yap. Telefonun değişse de biletlerin kaybolmaz. Hesabını istediğin an uygulamadan silebilirsin.</p>
+        </div></div>
+        <div class="fis"><span class="kod">823.07</span><div>
+          <h3>Gece baskısı</h3>
+          <p>Karanlık modda fişler koyu kartona, mürekkep krem rengine döner. Gece okumalarında göz yormaz.</p>
+        </div></div>
       </div>
     </div>
   </section>
 
-  <section id="ekranlar">
-    <div class="sar">
-      <div class="baslik"><div><div class="etiket soluk">Ekranlar</div><h2>Uygulamadan kareler</h2></div></div>
-      <div class="cizgi-m"></div>
-      <div class="ekranlar">
-        <figure><div class="telefon"><picture><source srcset="img/seri-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/seri-light.webp" width="640" height="1391" loading="lazy" alt="Seriler çekmecesi"></picture></div>
-          <figcaption><b>ÇEKMECE</b>Serilerin ve yolculuk şeritlerin.</figcaption></figure>
-        <figure><div class="telefon"><picture><source srcset="img/detay-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/detay-light.webp" width="640" height="1391" loading="lazy" alt="Seri fişi, hatlar görünümü"></picture></div>
-          <figcaption><b>HATLAR</b>Her alt seri kendi renginde bir hat.</figcaption></figure>
-        <figure><div class="telefon"><picture><source srcset="img/yayin-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/yayin-light.webp" width="640" height="1391" loading="lazy" alt="Seri fişi, yayın sırası görünümü"></picture></div>
-          <figcaption><b>SIRADAKİ SEFER</b>Kaldığın yer ve varış damgaları.</figcaption></figure>
-        <figure><div class="telefon"><picture><source srcset="img/kart-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/kart-light.webp" width="640" height="1391" loading="lazy" alt="Kitap bileti: varış günü ve puan"></picture></div>
-          <figcaption><b>BİLET</b>Varış gününü zımbala, puanını ver.</figcaption></figure>
-        <figure><div class="telefon"><picture><source srcset="img/tek-dark.webp" media="(prefers-color-scheme: dark)"><img src="img/tek-light.webp" width="640" height="1391" loading="lazy" alt="Tek kitaplar çekmecesi"></picture></div>
-          <figcaption><b>TEK KİTAPLAR</b>Okunanlar ve peronda bekleyenler.</figcaption></figure>
+  <section id="ekranlar" data-durak="EKRANLAR">
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">04</span><span class="ad">EKRANLAR</span><span class="veri">5 ekran</span></div>
+    <div class="ic">
+      <div class="ekr-bas">
+        <h2>Peronun içinden.</h2>
+        <div class="secim" role="group" aria-label="Görünüm">
+          <button type="button" data-tema="light" aria-pressed="true">AÇIK</button>
+          <button type="button" data-tema="dark" aria-pressed="false">GECE BASKISI</button>
+        </div>
+      </div>
+      <div class="galeri">
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/seri-light.webp" alt="Seriler" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/seri-dark.webp" alt="Seriler, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>01</span><b>Seriler ve yıl damgası</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/detay-light.webp" alt="Seri fişi, hatlar" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/detay-dark.webp" alt="Seri fişi, hatlar, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>02</span><b>Seri fişi ve hatlar</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/yayin-light.webp" alt="Yayın sırası" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/yayin-dark.webp" alt="Yayın sırası, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>03</span><b>Yayın sırası</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/kart-light.webp" alt="Zımbalı bilet" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/kart-dark.webp" alt="Zımbalı bilet, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>04</span><b>Zımbalı bilet</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/tek-light.webp" alt="Tek kitaplar" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/tek-dark.webp" alt="Tek kitaplar, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>05</span><b>Tek kitaplar çekmecesi</b></figcaption></figure>
       </div>
     </div>
   </section>
 
-  <section>
-    <div class="sar">
-      <div class="kapanis">
-        <img src="img/icon-light-256.png" alt="Peron simgesi">
-        <h2>Biletin hazır.</h2>
-        <p>Peron iPhone için hazırlanıyor. App Store'a çıktığında buradan indirebileceksin.</p>
-        <div class="indir">
-          <a class="appstore" data-appstore href="#" aria-disabled="true">
-            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M16.37 12.6c-.02-2.2 1.8-3.26 1.88-3.31-1.02-1.5-2.62-1.7-3.19-1.72-1.36-.14-2.65.8-3.34.8-.69 0-1.75-.78-2.88-.76-1.48.02-2.85.86-3.61 2.19-1.54 2.67-.39 6.62 1.11 8.79.73 1.06 1.6 2.25 2.75 2.2 1.1-.04 1.52-.71 2.85-.71s1.71.71 2.88.69c1.19-.02 1.94-1.08 2.67-2.14.84-1.23 1.19-2.42 1.21-2.48-.03-.01-2.32-.89-2.33-3.55zM14.2 6.13c.61-.74 1.02-1.76.9-2.78-.88.04-1.94.59-2.57 1.32-.56.65-1.06 1.69-.93 2.69.98.08 1.98-.5 2.6-1.23z"/></svg>
-            <span data-appstore-yazi>APP STORE'DA YAKINDA</span>
-          </a>
+  <section id="varis" data-durak="VARIŞ">
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">05</span><span class="ad">VARIŞ</span><span class="veri">son durak</span></div>
+    <div class="ic varis">
+      <div class="bilet">
+        <div class="gov">
+          <div class="ust-s"><span>BİLET</span><span>Sefer No. 01</span></div>
+          <div class="cift m"></div>
+          <h2>Sıradaki sefer seninki.</h2>
+          <span class="damga" aria-hidden="true">○ PERON · VARIŞ YAKINDA</span>
+        </div>
+        <div class="kocan">
+          <span>iPhone · App Store</span>
+          <a class="bilet-dugme" data-appstore href="#" aria-disabled="true"><span data-yazi="APP STORE'DAN İNDİR">APP STORE'DA YAKINDA</span></a>
         </div>
       </div>
     </div>
   </section>
 </main>
 
-<footer>
-  <div class="sar">
-    <span>© 2026 Peron</span>
-    <span>getperon.app</span>
-  </div>
+<footer class="wrap">
+  <div class="cift"></div>
+  <div class="alt"><span>Peron · getperon.app</span><span>© 2026</span></div>
 </footer>
 
 <script>
@@ -283,12 +354,60 @@
   document.querySelectorAll('[data-appstore]').forEach(function (a) {
     if (APP_STORE) {
       a.href = APP_STORE; a.removeAttribute('aria-disabled');
-      a.querySelector('[data-appstore-yazi]').textContent = "APP STORE'DAN İNDİR";
+      var y = a.querySelector('[data-yazi]'); y.textContent = y.getAttribute('data-yazi');
     } else {
+      a.removeAttribute('href');
       a.addEventListener('click', function (e) { e.preventDefault(); });
     }
   });
-  if (APP_STORE) document.querySelectorAll('[data-appstore-not]').forEach(function (n) { n.remove(); });
+
+  // Açık / gece baskısı düğmesi: seçim yoksa sistem teması.
+  var kok = document.documentElement, sistem = matchMedia('(prefers-color-scheme: dark)');
+  function temaGoster() {
+    var koyu = kok.dataset.theme ? kok.dataset.theme === 'dark' : sistem.matches;
+    document.querySelectorAll('[data-tema]').forEach(function (b) {
+      b.setAttribute('aria-pressed', String((b.dataset.tema === 'dark') === koyu));
+    });
+  }
+  document.querySelectorAll('[data-tema]').forEach(function (b) {
+    b.addEventListener('click', function () { kok.dataset.theme = b.dataset.tema; temaGoster(); });
+  });
+  sistem.addEventListener('change', temaGoster);
+  temaGoster();
+
+  // Sefer çizgisi: ekranın %55'ini geçen son durak "şu anki durak".
+  var duraklar = [].slice.call(document.querySelectorAll('[data-durak]'));
+  var isaretler = duraklar.map(function (s) { return s.querySelector('[data-isaret]'); });
+  var ray = document.querySelector('[data-ray]'), dolu = document.querySelector('[data-dolu]');
+  var adlar = duraklar.map(function (s) { return s.dataset.durak; });
+  var su = -1, bekliyor = 0;
+  function guncelle() {
+    bekliyor = 0;
+    var mr = ray.parentElement.getBoundingClientRect();
+    var pos = isaretler.map(function (m) { var r = m.getBoundingClientRect(); return r.top + r.height / 2 - mr.top; });
+    var boy = pos[pos.length - 1] - pos[0];
+    ray.style.top = pos[0] + 'px'; ray.style.height = boy + 'px';
+    var sh = kok.scrollHeight;
+    var sonda = boy > 0 && sh > innerHeight + 4 && innerHeight + scrollY >= sh - 4;
+    var cizgi = innerHeight * 0.55 - mr.top, cur = 0;
+    pos.forEach(function (p, i) { if (cizgi >= p) cur = i; });
+    if (sonda) cur = pos.length - 1;
+    dolu.style.height = (sonda ? boy : Math.max(0, Math.min(boy, cizgi - pos[0]))) + 'px';
+    if (cur === su) return;
+    su = cur;
+    duraklar.forEach(function (s, i) { s.classList.toggle('gecti', i <= cur); });
+    document.querySelector('[data-no]').textContent = String(cur + 1).padStart(2, '0');
+    document.querySelector('[data-simdi]').textContent = adlar[cur];
+    document.querySelector('[data-sonra]').hidden = cur >= adlar.length - 1;
+    document.querySelector('[data-sonraki]').textContent = adlar[Math.min(cur + 1, adlar.length - 1)];
+  }
+  function iste() { if (!bekliyor) bekliyor = requestAnimationFrame(guncelle); }
+  addEventListener('scroll', iste, { passive: true });
+  addEventListener('resize', iste);
+  addEventListener('load', iste);
+  if (window.ResizeObserver) new ResizeObserver(iste).observe(document.querySelector('main'));
+  if (document.fonts) document.fonts.ready.then(iste);
+  guncelle();
 </script>
 </body>
 </html>
