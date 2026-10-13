@@ -99,7 +99,7 @@
   <div class="fis" id="iste" hidden>
     <div class="fis-ust"><span>YOLCU KARTI</span><span>ŞİFREMİ UNUTTUM</span></div>
     <h1>Şifreni mi unuttun?</h1>
-    <p class="soluk">E-posta adresini yaz, yeni şifre bağlantısı gönderelim.</p>
+    <p class="soluk">E-posta adresini yaz. Yeni şifre bağlantısını oraya göndereceğiz.</p>
     <form id="iste-form" novalidate>
       <label><span>E-POSTA</span><input id="eposta" type="email" autocomplete="email" inputmode="email" autocapitalize="off" placeholder="ad@ornek.com" required></label>
       <div class="hata" id="iste-hata" role="alert"></div>
@@ -178,8 +178,8 @@
     var sn = /after (\d+) seconds?/i.exec(m);
     if (sn) { hata.textContent = sn[1] + ' saniye sonra yeniden dene.'; return; }
     // Projenin saatlik e-posta sınırı (Supabase'in ücretsiz e-posta servisi)
-    if (/email.*rate|over_email_send|rate limit/i.test(m)) { hata.textContent = 'Şu an çok fazla e-posta istendi. Lütfen bir saat sonra yeniden dene.'; return; }
-    if (/too many|429/i.test(m)) { hata.textContent = 'Çok sık denendi. Biraz bekleyip yeniden dene.'; return; }
+    if (/email.*rate|over_email_send|rate limit/i.test(m)) { hata.textContent = 'Çok fazla e-posta istendi. Bir saat sonra yeniden dene.'; return; }
+    if (/too many|429/i.test(m)) { hata.textContent = 'Çok sık denendi. Biraz bekle, sonra yeniden dene.'; return; }
     if (r.error) { hata.textContent = 'Gönderilemedi. Biraz sonra yeniden dene.'; return; }
     goster('gonderildi');
   });
