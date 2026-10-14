@@ -26,11 +26,11 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Crimson+Pro:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap">
 <style>
-  :root { --paper:#f4ecd8; --karton:#e3d5b2; --sheet:#fbf6e9; --ink:#2b2721; --ink2:#5e5547; --hair:#cdbf9f; --coral:#e2603f; --onink:#f4ecd8; --l:block; --d:none; color-scheme: light; }
+  :root { --paper:#f4ecd8; --karton:#e3d5b2; --sheet:#fbf6e9; --ink:#2b2721; --ink2:#5e5547; --hair:#cdbf9f; --coral:#e2603f; --mavi:#466ea5; --onink:#f4ecd8; --l:block; --d:none; color-scheme: light; }
   @media (prefers-color-scheme: dark) {
-    :root:not([data-theme="light"]) { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; --onink:#1d1b17; --l:none; --d:block; color-scheme: dark; }
+    :root:not([data-theme="light"]) { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; --mavi:#8caad2; --onink:#1d1b17; --l:none; --d:block; color-scheme: dark; }
   }
-  :root[data-theme="dark"] { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; --onink:#1d1b17; --l:none; --d:block; color-scheme: dark; }
+  :root[data-theme="dark"] { --paper:#1d1b17; --karton:#2c2923; --sheet:#25231e; --ink:#e8dfca; --ink2:#a89f8b; --hair:#3e3a32; --coral:#e8694a; --mavi:#8caad2; --onink:#1d1b17; --l:none; --d:block; color-scheme: dark; }
 
   * { box-sizing: border-box; }
   html { -webkit-text-size-adjust: 100%; scroll-behavior: smooth; }
@@ -138,6 +138,7 @@
   .fis p { margin: 0; font-size: 18px; line-height: 1.45; color: var(--ink2); text-wrap: pretty; }
   .renkler { display: flex; gap: 3px; padding-top: 4px; }
   .renkler span { width: 16px; height: 8px; background: var(--hair); }
+  .damga-k.mavi { color: var(--mavi); border-color: var(--mavi); }
   .damga-k { align-self: flex-start; font-weight: 700; font-size: 13px; letter-spacing: .08em; color: var(--coral); border: 1.5px solid var(--coral); padding: 3px 8px; transform: rotate(-3deg); margin-top: 4px; }
 
   /* 04 Ekranlar */
@@ -215,8 +216,8 @@
         </div>
         <div class="tel-sar">
           <div class="tel"><i></i><i></i><i></i><div class="ekran">
-            <img class="l" src="img/kart-light.webp" alt="Zımbalı bilet: varış günü ve puan" width="640" height="1392">
-            <img class="d" src="img/kart-dark.webp" alt="Zımbalı bilet, gece baskısı" width="640" height="1392">
+            <img class="l" src="img/kart-light.webp" alt="Yoldaki bilet: kalkış günü ve YOLDA damgası" width="640" height="1392">
+            <img class="d" src="img/kart-dark.webp" alt="Yoldaki bilet, gece baskısı" width="640" height="1392">
           </div></div>
         </div>
       </div>
@@ -237,21 +238,21 @@
         <li>
           <div class="hat" aria-hidden="true"><b></b><i></i></div>
           <span class="kod">DURAK 02</span>
-          <h3>Sıradaki sefer</h3>
-          <p>Peron sırayı bilir. Hattın sıradaki durağı seri fişinin en üstünde seni bekler.</p>
+          <h3>Yola çık</h3>
+          <p>Okumaya başlayınca biletine kalkış günü basılır. Peron kaç gündür yolda olduğunu sayar. Sıradaki durak seri fişinin en üstünde bekler.</p>
         </li>
         <li>
           <div class="hat" aria-hidden="true"><b class="bos"></b></div>
           <span class="kod">DURAK 03 · VARIŞ</span>
           <h3>Biletini zımbala</h3>
-          <p>Bitirince biletini zımbala. Varış günün ve puanın bilete basılır. Yıl damgasına bir sefer eklenir.</p>
+          <p>Bitirince biletini zımbala. Varış günün, puanın ve yolculuğun kaç gün sürdüğü bilete basılır. Yıl damgasına bir sefer eklenir.</p>
         </li>
       </ol>
     </div>
   </section>
 
   <section id="neler" data-durak="NELER VAR">
-    <div class="serit"><span class="isaret" data-isaret></span><span class="no">03</span><span class="ad">NELER VAR</span><span class="veri">7 fiş</span></div>
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">03</span><span class="ad">NELER VAR</span><span class="veri">10 fiş</span></div>
     <div class="ic">
       <h2>Yolculuk boyunca yanında.</h2>
       <div class="fisler">
@@ -265,23 +266,36 @@
           <p>Seriye bağlı olmayan kitaplar bu çekmecede durur. Aynı yazardan iki kitap okuyunca o yazarın hattı açılır.</p>
         </div></div>
         <div class="fis"><span class="kod">823.03</span><div>
-          <h3>Zımbalı bilet</h3>
-          <p>Bitirdiğin her kitabın bir bileti olur. Bilette varış günün ve beş yıldızlık puanın yazar.</p>
-          <span class="damga-k" aria-hidden="true">○ 20 MAY 2026</span>
+          <h3>Yolda ve zımbalı bilet</h3>
+          <p>Şu an okuduğun kitaplar yolda. Ana ekranda bir deste olarak durur. Bitirince biletini zımbalarsın, varış günün ve puanın bilete yazılır.</p>
+          <span class="damga-k mavi" aria-hidden="true">YOLDA · 08 EKİ 2026</span>
         </div></div>
         <div class="fis"><span class="kod">823.04</span><div>
-          <h3>Yıl damgası</h3>
-          <p>Bu yıl kaç sefer yaptığını ana ekrandaki kırmızı damga söyler.</p>
+          <h3>Biletin arkası</h3>
+          <p>Bileti çevir. Arkasına kitaptan sevdiğin cümleleri ve kendi notunu yaz. Her kitaba beş alıntı ve bir not sığar.</p>
         </div></div>
         <div class="fis"><span class="kod">823.05</span><div>
+          <h3>Bileti paylaş</h3>
+          <p>Biletini Instagram hikâyesi ya da gönderi boyunda bir görsel yap. İstersen bir alıntın da bilete eklenir.</p>
+        </div></div>
+        <div class="fis"><span class="kod">823.06</span><div>
+          <h3>Yıl damgası ve hedef</h3>
+          <p>Bu yıl kaç sefer yaptığını ana ekrandaki kırmızı damga söyler. Yıllık hedef koyarsan ne kadar kaldığını da gösterir.</p>
+          <span class="damga-k" aria-hidden="true">28 / 30 SEFER</span>
+        </div></div>
+        <div class="fis"><span class="kod">823.07</span><div>
+          <h3>Kalkış panosu</h3>
+          <p>Yılın okumaları gar panosu gibi dönen harflerle dolar. Aylara ve türlere göre seferler, ortalama yolculuk, en uzun yolculuk.</p>
+        </div></div>
+        <div class="fis"><span class="kod">823.08</span><div>
           <h3>Romandan şiire, çizgi romandan mangaya</h3>
           <p>Roman, öykü, şiir, deneme, tiyatro, manga, çizgi roman, anı ve kurgu dışı. Hepsi aynı listede.</p>
         </div></div>
-        <div class="fis"><span class="kod">823.06</span><div>
+        <div class="fis"><span class="kod">823.09</span><div>
           <h3>Kayıtlar hesabında</h3>
-          <p>Apple ya da e-postayla giriş yap. Telefonun değişse de biletlerin kaybolmaz. Hesabını istediğin an uygulamadan silebilirsin.</p>
+          <p>Üye olmadan da kullanabilirsin. Apple ya da e-postayla giriş yaparsan telefonun değişse de biletlerin kaybolmaz. Hesabını istediğin an uygulamadan silebilirsin.</p>
         </div></div>
-        <div class="fis"><span class="kod">823.07</span><div>
+        <div class="fis"><span class="kod">823.10</span><div>
           <h3>Gece baskısı</h3>
           <p>Karanlık modda fişler koyu kartona döner, mürekkep krem rengi olur. Gece gözünü yormaz.</p>
         </div></div>
@@ -290,7 +304,7 @@
   </section>
 
   <section id="ekranlar" data-durak="EKRANLAR">
-    <div class="serit"><span class="isaret" data-isaret></span><span class="no">04</span><span class="ad">EKRANLAR</span><span class="veri">5 ekran</span></div>
+    <div class="serit"><span class="isaret" data-isaret></span><span class="no">04</span><span class="ad">EKRANLAR</span><span class="veri">8 ekran</span></div>
     <div class="ic">
       <div class="ekr-bas">
         <h2>Peronun içinden.</h2>
@@ -301,25 +315,37 @@
       </div>
       <div class="galeri">
         <figure><div class="tel"><div class="ekran">
-          <img class="l" src="img/seri-light.webp" alt="Seriler" loading="lazy" width="640" height="1392">
-          <img class="d" src="img/seri-dark.webp" alt="Seriler, gece baskısı" loading="lazy" width="640" height="1392">
+          <img class="l" src="img/seri-light.webp" alt="Ana ekran: yıl damgası, şu an yoldaki kitaplar ve seriler" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/seri-dark.webp" alt="Ana ekran: yıl damgası, şu an yoldaki kitaplar ve seriler, gece baskısı" loading="lazy" width="640" height="1392">
         </div></div><figcaption><span>01</span><b>Seriler ve yıl damgası</b></figcaption></figure>
         <figure><div class="tel"><div class="ekran">
-          <img class="l" src="img/detay-light.webp" alt="Seri fişi, hatlar" loading="lazy" width="640" height="1392">
-          <img class="d" src="img/detay-dark.webp" alt="Seri fişi, hatlar, gece baskısı" loading="lazy" width="640" height="1392">
+          <img class="l" src="img/detay-light.webp" alt="Seri fişi: yoldaki cilt ve hatlar" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/detay-dark.webp" alt="Seri fişi: yoldaki cilt ve hatlar, gece baskısı" loading="lazy" width="640" height="1392">
         </div></div><figcaption><span>02</span><b>Seri fişi ve hatlar</b></figcaption></figure>
         <figure><div class="tel"><div class="ekran">
-          <img class="l" src="img/yayin-light.webp" alt="Yayın sırası" loading="lazy" width="640" height="1392">
-          <img class="d" src="img/yayin-dark.webp" alt="Yayın sırası, gece baskısı" loading="lazy" width="640" height="1392">
-        </div></div><figcaption><span>03</span><b>Yayın sırası</b></figcaption></figure>
+          <img class="l" src="img/harita-light.webp" alt="Peron haritası: serinin hatları metro şeması gibi" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/harita-dark.webp" alt="Peron haritası: serinin hatları metro şeması gibi, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>03</span><b>Peron haritası</b></figcaption></figure>
         <figure><div class="tel"><div class="ekran">
-          <img class="l" src="img/kart-light.webp" alt="Zımbalı bilet" loading="lazy" width="640" height="1392">
-          <img class="d" src="img/kart-dark.webp" alt="Zımbalı bilet, gece baskısı" loading="lazy" width="640" height="1392">
-        </div></div><figcaption><span>04</span><b>Zımbalı bilet</b></figcaption></figure>
+          <img class="l" src="img/kart-light.webp" alt="Bilet: kalkış günü ve mavi YOLDA damgası" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/kart-dark.webp" alt="Bilet: kalkış günü ve mavi YOLDA damgası, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>04</span><b>Yoldaki bilet</b></figcaption></figure>
         <figure><div class="tel"><div class="ekran">
-          <img class="l" src="img/tek-light.webp" alt="Tek kitaplar" loading="lazy" width="640" height="1392">
-          <img class="d" src="img/tek-dark.webp" alt="Tek kitaplar, gece baskısı" loading="lazy" width="640" height="1392">
-        </div></div><figcaption><span>05</span><b>Tek kitaplar çekmecesi</b></figcaption></figure>
+          <img class="l" src="img/arka-light.webp" alt="Biletin arkası: not" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/arka-dark.webp" alt="Biletin arkası: not, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>05</span><b>Biletin arkası</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/paylas-light.webp" alt="Bileti paylaş: hikâye görseli" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/paylas-dark.webp" alt="Bileti paylaş: hikâye görseli, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>06</span><b>Bileti paylaş</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/pano-light.webp" alt="Kalkış panosu: yılın seferleri dönen harflerle" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/pano-dark.webp" alt="Kalkış panosu: yılın seferleri dönen harflerle, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>07</span><b>Kalkış panosu</b></figcaption></figure>
+        <figure><div class="tel"><div class="ekran">
+          <img class="l" src="img/tek-light.webp" alt="Tek kitaplar çekmecesi" loading="lazy" width="640" height="1392">
+          <img class="d" src="img/tek-dark.webp" alt="Tek kitaplar çekmecesi, gece baskısı" loading="lazy" width="640" height="1392">
+        </div></div><figcaption><span>08</span><b>Tek kitaplar çekmecesi</b></figcaption></figure>
       </div>
     </div>
   </section>
