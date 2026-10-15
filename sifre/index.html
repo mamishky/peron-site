@@ -2,6 +2,9 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<!-- Güvenlik politikası: sayfadaki iki <script> bloğundan biri değişirse aşağıdaki sha256 değerleri de yenilenmeli,
+     yoksa tarayıcı o betiği çalıştırmaz. -->
+<meta http-equiv="Content-Security-Policy" content="default-src 'none'; script-src https://cdn.jsdelivr.net 'sha256-tNzsh1gAq3hIzX/r085/QKk/WkuL6Lh2v1PKwvlgOQw=' 'sha256-BSIZzfK1KFyoK4ai1K5b3Xejw/eSq0Di7EtF8+uXM6U='; style-src 'unsafe-inline' https://fonts.googleapis.com; font-src https://fonts.gstatic.com; img-src 'self'; connect-src https://arxwwekjxgrgyruopvzp.supabase.co; base-uri 'none'; form-action 'none'; object-src 'none'">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
 <meta name="robots" content="noindex">
 <meta name="referrer" content="no-referrer">
@@ -13,6 +16,8 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,600;1,400&display=swap">
 <script>
+  // Başka bir sitenin çerçevesi içinde açılırsa sayfayı gösterme (tıklama tuzağına karşı).
+  if (window.top !== window.self) document.documentElement.style.display = 'none';
   // E-postadaki bağlantının taşıdığı bilgiyi al ve adres çubuğundan hemen sil.
   (function () {
     var p = new URLSearchParams(location.search);
@@ -114,7 +119,8 @@
     <div class="adim">Bu adresle bir Peron üyeliği varsa yeni şifre bağlantısı birkaç dakika içinde gelir. Gelen kutunda yoksa istenmeyen klasörüne de bak.</div>
   </div>
 
-<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.js"
+        integrity="sha384-0w2KAL2YHP6wKOkUDzkCDGgVvfmHnj02DHeQ6XcHOgTfFsGyonKOpShMH1x6nk9o" crossorigin="anonymous"></script>
 <script>
   // Uygulamayla aynı Supabase projesi; yayınlanabilir anahtar herkese açık olacak şekilde tasarlanmıştır (erişim RLS ile sınırlı).
   var sb = supabase.createClient('https://arxwwekjxgrgyruopvzp.supabase.co', 'sb_publishable_sPMEqz96nenj0LYJyGUB8g_4YeLFx-Z',

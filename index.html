@@ -2,6 +2,7 @@
 <html lang="tr">
 <head>
 <meta charset="utf-8">
+<meta name="referrer" content="no-referrer">
 <script>
   // Üyelik e-postasındaki bağlantı ana sayfaya düşerse doğru sayfaya aktar.
   if (/type=recovery/.test(location.hash + location.search))
@@ -112,7 +113,8 @@
   .tel > i:nth-child(3) { right: -3px; top: 24%; height: 10%; border-radius: 0 2px 2px 0; }
   .ekran { position: relative; aspect-ratio: 640 / 1392; border-radius: 12% / 5.6%; overflow: hidden; background: #000; }
   .ekran img { width: 100%; height: 100%; object-fit: cover; }
-  .ekran::after { content: ""; position: absolute; top: 2.1%; left: 50%; width: 31%; height: 3%; transform: translateX(-50%); background: #000; border-radius: 99px; }
+  /* Dynamic Island: iPhone Pro ölçüleri (393×852 pt ekranda 126×37 pt, üstten 11 pt) */
+  .ekran::after { content: ""; position: absolute; z-index: 1; top: 1.33%; left: 50%; width: 32%; aspect-ratio: 126 / 37; transform: translateX(-50%); background: #000; border-radius: 99px; pointer-events: none; }
 
   /* 02 Nasıl çalışır */
   #nasil h2 { padding: clamp(36px, 5vw, 56px) 0 clamp(32px, 4vw, 48px); }
