@@ -13,10 +13,16 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,600;1,400&display=swap">
 <script>
-  // Onay bağlantısındaki oturum bilgilerini adres çubuğundan hemen sil; bu sayfa onları kullanmaz.
+  // Onay bağlantısının taşıdığı bilgiyi al ve adres çubuğundan hemen sil.
   (function () {
+    var p = new URLSearchParams(location.search);
     var q = location.search + '&' + location.hash.replace(/^#/, '');
-    window.ONAY_HATA = /error/.test(q);
+    // Peron'un e-posta şablonu: ?token_hash=…&type=email. Onay bu sayfada, düğmeye basınca yapılır.
+    // Böylece e-posta programlarının bağlantıyı önceden açan tarayıcıları anahtarı harcayamaz.
+    var t = p.get('type');
+    window.ONAY_ANAHTAR = p.get('token_hash') && (t === 'email' || t === 'signup') ? p.get('token_hash') : null;
+    // Eski e-postalar: Supabase onaylayıp buraya yönlendirir, hata varsa adreste yazar
+    window.ONAY_HATA = !window.ONAY_ANAHTAR && /error/.test(q);
     window.ONAY_SURESI = /otp_expired|expired/.test(q);
     if (location.search || location.hash) history.replaceState(null, '', location.pathname);
   })();
@@ -51,12 +57,25 @@
            border: 2.5px solid var(--mercan); outline: 1px solid var(--mercan); outline-offset: 3px; }
   .adim { margin: 16px 16px 0; padding: 12px 14px; background: var(--kagit-acik); border: 1px dashed var(--soluk); }
   .adim b { font-weight: 700; }
+  button { display: block; width: calc(100% - 32px); margin: 18px 16px 0; padding: 16px 10px; min-height: 44px;
+           background: var(--murekkep); color: var(--kagit); border: 0; border-radius: 0; cursor: pointer;
+           font: 700 15px 'Archivo Narrow', Arial, sans-serif; letter-spacing: .18em; -webkit-appearance: none; }
+  button:disabled { opacity: .55; cursor: default; }
+  .uyari { margin: 12px 16px 0; color: var(--mercan-metin); min-height: 1.5em; }
   [hidden] { display: none !important; }
 </style>
 </head>
 <body>
   <div class="ust"><img src="../img/icon-180.png" alt="">PERON</div>
   <div class="cizgi"></div>
+
+  <div class="fis" id="bekle" hidden>
+    <div class="fis-ust"><span>YOLCU KARTI</span><span>ÜYELİK</span></div>
+    <h1>Son bir adım.</h1>
+    <p class="soluk">Yolcu kartını açmak için e-postanı onayla.</p>
+    <button type="button" id="onayla">E-POSTAMI ONAYLA</button>
+    <div class="uyari" id="uyari" role="alert"></div>
+  </div>
 
   <div class="fis" id="tamam">
     <div class="fis-ust"><span>YOLCU KARTI</span><span id="tarih"></span></div>
@@ -82,11 +101,39 @@
   var d = new Date();
   document.getElementById('tarih').textContent =
     String(d.getDate()).padStart(2, '0') + '.' + String(d.getMonth() + 1).padStart(2, '0') + '.' + d.getFullYear();
-  if (window.ONAY_HATA) {
-    document.getElementById('tamam').hidden = true;
-    document.getElementById('hata').hidden = false;
-    if (window.ONAY_SURESI) document.getElementById('hata-metin').textContent = 'Onay bağlantısının süresi dolmuş.';
+  var $ = function (id) { return document.getElementById(id); };
+  function goster(id) { ['bekle', 'tamam', 'hata'].forEach(function (k) { $(k).hidden = k !== id; }); }
+  function gecersiz(suresi) {
+    goster('hata');
+    if (suresi) $('hata-metin').textContent = 'Onay bağlantısının süresi dolmuş ya da daha önce kullanılmış.';
     document.title = 'Peron · Bağlantı geçersiz';
+  }
+
+  if (window.ONAY_ANAHTAR) {
+    goster('bekle');
+    $('onayla').addEventListener('click', async function () {
+      var btn = this;
+      btn.disabled = true;
+      $('uyari').textContent = '';
+      try {
+        // Yayınlanabilir anahtar herkese açık olacak şekilde tasarlanmıştır. Dönen oturum kullanılmaz:
+        // kullanıcı uygulamaya dönüp giriş yapar.
+        var r = await fetch('https://arxwwekjxgrgyruopvzp.supabase.co/auth/v1/verify', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', 'apikey': 'sb_publishable_sPMEqz96nenj0LYJyGUB8g_4YeLFx-Z' },
+          body: JSON.stringify({ type: 'email', token_hash: window.ONAY_ANAHTAR })
+        });
+        if (r.ok) { goster('tamam'); return; }
+        var j = await r.json().catch(function () { return {}; });
+        if (r.status === 403 || r.status === 400 || r.status === 404) { gecersiz(/expired|invalid/.test(j.error_code + ' ' + j.msg)); return; }
+        $('uyari').textContent = 'Onaylanamadı. Biraz sonra yeniden dene.';
+      } catch (e) {
+        $('uyari').textContent = 'Bağlantı kurulamadı. İnternetini kontrol edip yeniden dene.';
+      }
+      btn.disabled = false;
+    });
+  } else if (window.ONAY_HATA) {
+    gecersiz(window.ONAY_SURESI);
   }
 </script>
 </body>
