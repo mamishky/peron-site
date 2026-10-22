@@ -400,7 +400,7 @@
     var LW = 190, RH = 72, TOP = 58, SIDE = 28;
     function x(lane) { return SIDE + LW * lane + 30; }
     function y(row) { return TOP + row * RH + 14; }
-    var W = Math.max(m.lines.length * LW + SIDE * 2, 420), H = TOP + Math.max(m.rows, 1) * RH + (m.unlined.length ? 130 : 24);
+    var W = Math.max(m.lines.length * LW + SIDE * 2, 420), H = TOP + Math.max(m.rows, 1) * RH + 24;
     var svg = sv('svg', { width: W, height: H, viewBox: '0 0 ' + W + ' ' + H, role: 'group', 'aria-label': 'Akademi haritası', style: 'display:block' });
     var onWay = d.papers.filter(function (p) { return p.status === 'reading'; });
     var transfers = d.papers.filter(function (p) { return linesOf(p).length > 1; }).length;
@@ -441,22 +441,6 @@
       }
       svg.appendChild(g);
     });
-    // hatsızlar
-    if (m.unlined.length) {
-      var top = H - 118;
-      svg.appendChild(sv('rect', { x: 18, y: top, width: W - 36, height: 100, fill: 'none', stroke: 'var(--kenar-soluk)', 'stroke-width': 1.5, 'stroke-dasharray': '5 3' }));
-      svg.appendChild(sv('text', { x: 32, y: top + 22, text: 'HATSIZ · ' + m.unlined.length, fill: 'var(--soluk)', style: "font:700 11px 'Archivo Narrow',sans-serif;letter-spacing:.16em" }));
-      m.unlined.forEach(function (p, i) {
-        var per = Math.max(1, Math.floor((W - 80) / 36)), cx = 40 + (i % per) * 36, cy = top + 52 + Math.floor(i / per) * 30;
-        var g = sv('g', { tabindex: 0, role: 'button', 'aria-label': p.title, style: 'cursor:pointer;outline:none' });
-        var pick = function () { state.paper = p.id; state.line = '__un'; keepScroll(); renderMap(); };
-        g.addEventListener('click', pick); g.addEventListener('keydown', function (e) { if (e.key === 'Enter') pick(); });
-        g.appendChild(sv('rect', { x: cx - 18, y: cy - 18, width: 36, height: 36, fill: 'transparent' }));
-        g.appendChild(sv('rect', { x: cx - 8, y: cy - 8, width: 16, height: 16, fill: 'var(--kagit)', stroke: state.paper === p.id ? 'var(--murekkep)' : 'var(--soluk)', 'stroke-width': 2 }));
-        svg.appendChild(g);
-      });
-    }
-
     var cur = state.paper ? paperById(state.paper) : null;
     var scroller = el('div', { class: 'harita-alan', id: 'harita-alan' }, [svg]);
     var legend = el('div', { class: 'cipler', style: 'margin-top:10px' }, d.lines.map(function (l) {
@@ -473,8 +457,23 @@
       legend]);
     var sag = el('aside', { class: 'sag' });
     if (cur) sag.appendChild(detail(cur)); else sag.appendChild(el('p', { class: 'soluk', text: 'Bir durak seç. Bileti burada açılır.' }));
-    root.replaceChildren(el('div', { class: 'harita-sayfa' }, [el('section', { class: 'harita-sol' }, [head, scroller]), sag]));
+    var parts = [head, scroller];
+    if (m.unlined.length) parts.push(unlinedBox(m.unlined));
+    root.replaceChildren(el('div', { class: 'harita-sayfa' }, [el('section', { class: 'harita-sol' }, parts), sag]));
     var a = document.getElementById('harita-alan'); if (a && state.scroll) { a.scrollLeft = state.scroll[0]; a.scrollTop = state.scroll[1]; }
+  }
+  // Hatsız makaleler: haritanın altında, adıyla okunan çipler. Çok olunca ilk 14'ü görünür, gerisi açılır.
+  function unlinedBox(list) {
+    var open = state.unlinedOpen, shown = open ? list : list.slice(0, 14);
+    var box = el('div', { class: 'hatsiz-kutu' }, [
+      el('div', { class: 'etiket', text: 'Hatsız · ' + list.length + ' makale', style: 'margin-bottom:8px' }),
+      el('div', { class: 'cipler' }, shown.map(function (p) {
+        var label = [PA.shortAuthors(p), p.year].filter(Boolean).join(' ') || p.title.slice(0, 24);
+        return el('button', { type: 'button', class: 'cip hatsiz' + (state.paper === p.id ? ' acik' : ''), title: p.title, onclick: function () { state.paper = p.id; state.line = '__un'; keepScroll(); renderMap(); } },
+          [el('span', { class: 'kare ' + (p.status === 'read' ? 'dolu' : p.status === 'reading' ? 'yolda' : '') }), label]);
+      })),
+      list.length > 14 ? el('button', { class: 'kapat', style: 'margin-top:6px', text: open ? 'daha az göster' : '+ ' + (list.length - 14) + ' makale daha', onclick: function () { state.unlinedOpen = !open; keepScroll(); renderMap(); } }) : null]);
+    return box;
   }
   function keepScroll() { var a = document.getElementById('harita-alan'); if (a) state.scroll = [a.scrollLeft, a.scrollTop]; }
   [].forEach.call(document.querySelectorAll('.sekme[data-v]'), function (b) {
