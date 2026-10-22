@@ -5,7 +5,7 @@
   'use strict';
   var db = window.supabase.createClient('https://arxwwekjxgrgyruopvzp.supabase.co', 'sb_publishable_sPMEqz96nenj0LYJyGUB8g_4YeLFx-Z');
   var root = document.getElementById('uygulama');
-  var state = { data: null, line: null, paper: null, uid: null, view: 'liste', labels: true, q: '' };
+  var state = { data: null, line: null, paper: null, uid: null, view: 'liste', labels: true, q: '', selMode: null, sel: {} };
   try { state.labels = localStorage.getItem('akademiHaritaEtiket') !== '0'; } catch (e) {}
   var PALETTE = ['#d9a21b', '#2f7d50', '#2c4f9b', '#8a5734', '#4b98c4', '#a6435c', '#7a4f9a', '#2b8a8a'];
   var PREFIXES = ['TEZ:', 'LİTERATÜR:', 'DERS:', 'PROJE:', 'MAKALE:'];
@@ -14,6 +14,7 @@
   function el(tag, attrs, kids) {
     var n = document.createElement(tag);
     Object.keys(attrs || {}).forEach(function (k) {
+      if (attrs[k] === undefined || attrs[k] === null) return;
       if (k === 'class') n.className = attrs[k]; else if (k === 'text') n.textContent = attrs[k]; else if (k === 'value') n.value = attrs[k];
       else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), attrs[k]); else n.setAttribute(k, attrs[k]);
     });
@@ -158,6 +159,25 @@
     },
     removeStop: function (lineID, pid) {
       return mutate(function (data) { var l = lById(data, lineID); if (l) l.stops = (l.stops || []).filter(function (s) { return s !== pid; }); });
+    },
+    deletePapers: function (ids) {
+      return mutate(function (data) {
+        var set = {}; ids.forEach(function (i) { set[i] = 1; });
+        data.papers = data.papers.filter(function (p) { return !set[p.id]; });
+        data.lines.forEach(function (l) { l.stops = (l.stops || []).filter(function (x) { return !set[x]; }); });
+        ids.forEach(function (i) { delete data.backs[i]; });
+      });
+    },
+    removeStops: function (lineID, ids) {
+      return mutate(function (data) { var l = lById(data, lineID); if (!l) return; var set = {}; ids.forEach(function (i) { set[i] = 1; }); l.stops = (l.stops || []).filter(function (x) { return !set[x]; }); });
+    },
+    deleteLines: function (ids) {
+      var codes = [];
+      return mutate(function (data) {
+        codes = [];
+        ids.forEach(function (id) { var s = data.shares && data.shares[id]; if (s && s.code) codes.push(s.code); if (data.shares) delete data.shares[id]; });
+        data.lines = data.lines.filter(function (l) { return ids.indexOf(l.id) < 0; });
+      }).then(function () { return Promise.all(codes.map(function (c) { return db.from('shared_lines').delete().eq('code', c).then(function () {}, function () {}); })); });
     },
     stopShare: function (lineID) {
       var code;
@@ -463,9 +483,23 @@
   if (window.matchMedia) matchMedia('(prefers-color-scheme: dark)').addEventListener('change', function () { if (state.view === 'harita' && state.data) render(); });
 
 
+
+  // ---- Toplu seçme ve silme
+  function selCount() { return Object.keys(state.sel).length; }
+  function selIds() { return Object.keys(state.sel); }
+  function selToggle(id) { if (state.sel[id]) delete state.sel[id]; else state.sel[id] = 1; render(); }
+  function selStart(mode) { state.selMode = mode; state.sel = {}; render(); }
+  function selEnd() { state.selMode = null; state.sel = {}; render(); }
+  function selBar(allIds, extra) {
+    var n = selCount(), all = allIds.length && allIds.every(function (id) { return state.sel[id]; });
+    return el('div', { class: 'eylem' }, [
+      el('button', { class: 'kapat', text: all ? 'Seçimi kaldır' : 'Tümünü seç', onclick: function () { if (all) state.sel = {}; else allIds.forEach(function (id) { state.sel[id] = 1; }); render(); } }),
+      el('b', { text: n + ' seçili' }), el('span', { style: 'flex:1' })].concat(extra || [], [el('button', { class: 'kapat', text: 'Bitti', onclick: selEnd })]));
+  }
+
   // ---- Çizim
   var searchInput = el('input', { type: 'search', class: 'ara', placeholder: 'Ara  ( / )', 'aria-label': 'Akademide ara', autocomplete: 'off' });
-  searchInput.addEventListener('input', function () { state.q = searchInput.value; if (state.view === 'harita') { state.view = 'liste'; } render(); });
+  searchInput.addEventListener('input', function () { state.selMode = null; state.sel = {}; state.q = searchInput.value; if (state.view === 'harita') { state.view = 'liste'; } render(); });
   searchInput.addEventListener('keydown', function (e) { if (e.key === 'Escape') { searchInput.value = ''; state.q = ''; searchInput.blur(); render(); } });
 
   function render() {
@@ -492,19 +526,30 @@
       el('div', { style: 'display:flex;gap:6px;margin-bottom:8px' }, [
         el('button', { class: 'dugme bos', text: 'İçe aktar', onclick: openImport, style: 'flex:1;padding:0 8px' }),
         el('button', { class: 'dugme bos', text: '+ Hat', onclick: function () { openLineForm(null); }, style: 'flex:1;padding:0 8px' })]),
-      el('div', { class: 'etiket', text: 'Hatlar', style: 'margin:6px 0' })
+      el('div', { style: 'display:flex;justify-content:space-between;align-items:center;margin:6px 0' }, [el('div', { class: 'etiket', text: 'Hatlar' }),
+        d.lines.length && state.selMode !== 'lines' ? el('button', { class: 'kapat', text: 'Seç', style: 'min-height:32px', onclick: function () { selStart('lines'); } }) : null])
     ]);
     d.lines.forEach(function (l) {
       var ps = papersIn(l), read = ps.filter(function (p) { return p.status === 'read'; }).length, way = ps.filter(function (p) { return p.status === 'reading'; }).length;
-      sol.appendChild(el('button', { class: 'hat-satir' + (state.line === l.id && !state.q ? ' secili' : ''), onclick: function () { state.q = ''; searchInput.value = ''; state.line = l.id; state.paper = null; render(); } }, [
+      var lsel = state.selMode === 'lines';
+      sol.appendChild(el('button', { class: 'hat-satir' + (state.line === l.id && !state.q && !lsel ? ' secili' : '') + (lsel && state.sel[l.id] ? ' isaretli' : ''), onclick: function () {
+        if (lsel) { selToggle(l.id); return; }
+        state.selMode = null; state.sel = {}; state.q = ''; searchInput.value = ''; state.line = l.id; state.paper = null; render(); } }, [
+        lsel ? el('span', { class: 'kutu', text: state.sel[l.id] ? '✓' : '' }) : null,
         el('span', { class: 'rozet', text: PA.up((l.name || '?').charAt(0)), style: 'background:' + tint(l.color) }),
         el('span', { class: 'hat-ad', text: l.name }),
-        el('span', { class: way ? 'mavi' : 'soluk', text: way ? way + ' yolda · ' : '' }),
+        el('span', { class: way ? 'mavi' : 'soluk', text: way && !lsel ? way + ' yolda · ' : '' }),
         el('b', { text: ('0' + read).slice(-2) + '/' + ('0' + ps.length).slice(-2) })]));
     });
     var un = unlined();
     if (un.length) sol.appendChild(el('button', { class: 'hat-satir' + (state.line === '__un' && !state.q ? ' secili' : ''), onclick: function () { state.q = ''; searchInput.value = ''; state.line = '__un'; state.paper = null; render(); } }, [
       el('span', { class: 'rozet', text: '·', style: 'background:var(--soluk)' }), el('span', { class: 'hat-ad', text: 'Hatsız' }), el('b', { text: String(un.length) })]));
+    if (state.selMode === 'lines') {
+      sol.appendChild(selBar(d.lines.map(function (l) { return l.id; }), [el('button', { class: 'dugme', text: selCount() ? selCount() + ' hattı sil' : 'Sil', disabled: selCount() ? undefined : 'disabled', onclick: function () {
+        var ids = selIds(), n = ids.length;
+        askConfirm(n + ' hat silinsin mi?', 'Hatların makaleleri akademide kalır (hatsız olurlar).' + (ids.some(function (i) { return d.shares && d.shares[i]; }) ? ' Paylaşılan hatların bağlantısı kapanır.' : ''), 'Sil', function () {
+          ops.deleteLines(ids).then(function () { state.line = state.data.lines.length ? state.data.lines[0].id : null; state.paper = null; selEnd(); toast('SİLİNDİ', n + ' HAT'); }, fail); }); } })]));
+    }
     sol.appendChild(el('div', { class: 'etiket', text: 'Tüm akademi', style: 'margin:18px 0 6px' }));
     sol.appendChild(el('div', { style: 'display:flex;gap:6px' }, [
       el('button', { class: 'dugme bos', text: '.ris', onclick: function () { PA.download(fileName('ris'), PA.risFile(d.papers, linesNames, d.backs)); } }),
@@ -520,17 +565,29 @@
   }
 
   function stopRow(p, i, line, canMove, snippet) {
+    var psel = state.selMode === 'papers', on = psel && !!state.sel[p.id];
     var st = p.status === 'read' ? el('span', { class: 'varis', text: p.date ? PA.stamp(p.date) : 'VARIŞ' }) : p.status === 'reading' ? el('span', { class: 'yolda', text: 'YOLDA' }) : null;
-    var open = el('button', { class: 'durak' + (state.paper === p.id ? ' secili' : ''), onclick: function () { state.paper = p.id; if (line) state.line = line.id; render(); } }, [
-      el('span', { class: 'no', text: i == null ? '·' : ('0' + (i + 1)).slice(-2) }),
+    var open = el('button', { class: 'durak' + (state.paper === p.id && !psel ? ' secili' : '') + (on ? ' isaretli' : ''), onclick: function () { if (psel) { selToggle(p.id); return; } state.paper = p.id; if (line) state.line = line.id; render(); } }, [
+      psel ? el('span', { class: 'kutu', text: on ? '✓' : '' }) : el('span', { class: 'no', text: i == null ? '·' : ('0' + (i + 1)).slice(-2) }),
       el('span', {}, [el('span', { class: 'baslik', text: p.title }), el('br'), el('span', { class: 'meta', text: [PA.shortAuthors(p), p.year].filter(Boolean).join(' · ') }),
         snippet ? el('span', { class: 'meta', style: 'display:block;font-style:italic', text: snippet }) : null]), st]);
-    if (!canMove) return open;
+    if (!canMove || psel) return open;
     var ctrl = el('div', { class: 'siralama' }, [
       el('button', { text: '↑', title: 'Yukarı taşı', 'aria-label': 'Yukarı taşı', onclick: function () { ops.moveStop(line.id, p.id, -1).then(render, fail); } }),
       el('button', { text: '↓', title: 'Aşağı taşı', 'aria-label': 'Aşağı taşı', onclick: function () { ops.moveStop(line.id, p.id, 1).then(render, fail); } }),
       el('button', { text: '×', title: 'Hattan çıkar', 'aria-label': 'Hattan çıkar', onclick: function () { ops.removeStop(line.id, p.id).then(render, fail); } })]);
     return el('div', { class: 'durak-satir' }, [open, ctrl]);
+  }
+
+  // Makale seçimi için alttaki eylem çubuğu: hattan çıkar (hat içindeyken) ve sil
+  function paperBar(ps, line) {
+    var n = selCount(), extra = [];
+    if (line) extra.push(el('button', { class: 'dugme bos', text: 'Hattan çıkar', disabled: n ? undefined : 'disabled', onclick: function () {
+      var ids = selIds(); ops.removeStops(line.id, ids).then(function () { selEnd(); toast('ÇIKARILDI', ids.length + ' MAKALE'); }, fail); } }));
+    extra.push(el('button', { class: 'dugme', text: n ? n + ' makaleyi sil' : 'Sil', disabled: n ? undefined : 'disabled', onclick: function () {
+      var ids = selIds(); askConfirm(ids.length + ' makale silinsin mi?', 'Makaleler bütün hatlardan, alıntıları ve notlarıyla birlikte silinir. Bu geri alınamaz.', 'Sil', function () {
+        ops.deletePapers(ids).then(function () { if (state.paper && ids.indexOf(state.paper) >= 0) state.paper = null; selEnd(); toast('SİLİNDİ', ids.length + ' MAKALE'); }, fail); }); } }));
+    return selBar(ps.map(function (p) { return p.id; }), extra);
   }
 
   function resultsView() {
@@ -540,8 +597,10 @@
       el('h1', { text: '“' + state.q + '”', style: "font:700 34px/1.05 'Archivo Narrow',sans-serif;margin:4px 0 6px;word-break:break-word" }),
       el('div', { class: 'italik', style: 'font-size:18px', text: res.length ? res.length + ' sonuç' : 'Sonuç yok. Başlık, yazar, DOI, alıntı ve notlarda arandı.' }),
       res.length ? el('div', { style: 'display:flex;gap:8px;margin:14px 0 18px;flex-wrap:wrap' }, [
-        el('button', { class: 'dugme', text: 'Sonuçların kaynakçası · kopyala', onclick: function () { PA.copyRich(PA.bibliography(ps)).then(function () { toast('KOPYALANDI', ps.length + ' KAYNAK'); }); } })]) : null,
-      el('div', { style: 'border-top:1.5px solid var(--murekkep)' }, res.map(function (r) { return stopRow(r.paper, null, linesOf(r.paper)[0] || null, false, r.snippet); }))]);
+        el('button', { class: 'dugme', text: 'Sonuçların kaynakçası · kopyala', onclick: function () { PA.copyRich(PA.bibliography(ps)).then(function () { toast('KOPYALANDI', ps.length + ' KAYNAK'); }); } }),
+        state.selMode !== 'papers' ? el('button', { class: 'dugme bos', text: 'Seç', onclick: function () { selStart('papers'); } }) : null]) : null,
+      el('div', { style: 'border-top:1.5px solid var(--murekkep)' }, res.map(function (r) { return stopRow(r.paper, null, linesOf(r.paper)[0] || null, false, r.snippet); })),
+      state.selMode === 'papers' && res.length ? paperBar(ps, null) : null]);
   }
 
   function lineView() {
@@ -559,7 +618,8 @@
         el('button', { class: 'dugme', text: 'Hattın kaynakçası · kopyala', onclick: function () { PA.copyRich(PA.bibliography(ps)).then(function () { toast('KOPYALANDI', ps.length + ' KAYNAK'); }); } }),
         el('button', { class: 'dugme bos', text: '.ris', onclick: function () { PA.download(fileName('ris', title), PA.risFile(ps, linesNames, d.backs)); } }),
         el('button', { class: 'dugme bos', text: '.bib', onclick: function () { PA.download(fileName('bib', title), PA.bibFile(ps, linesNames, d.backs)); } }),
-        line ? el('button', { class: 'dugme bos', text: 'Hattı düzenle', onclick: function () { openLineForm(line); } }) : null])
+        line ? el('button', { class: 'dugme bos', text: 'Hattı düzenle', onclick: function () { openLineForm(line); } }) : null,
+        ps.length && state.selMode !== 'papers' ? el('button', { class: 'dugme bos', text: 'Seç', onclick: function () { selStart('papers'); } }) : null])
     ];
     if (share && share.code) {
       var url = 'https://getperon.app/h/' + share.code;
@@ -577,6 +637,7 @@
     }
     if (!ps.length) kids.push(el('p', { class: 'soluk', text: isUn ? 'Hatsız makale yok.' : 'Bu hatta henüz durak yok. “+ Makale ekle” ile bu hatta ekleyebilirsin.' }));
     kids.push(el('div', { style: 'border-top:1.5px solid var(--murekkep)' }, ps.map(function (p, i) { return stopRow(p, i, line, !!line && !isUn); })));
+    if (state.selMode === 'papers') kids.push(paperBar(ps, line && !isUn ? line : null));
     return el('section', { class: 'orta' }, kids);
   }
 

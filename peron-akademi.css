@@ -135,3 +135,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
 .renk { width: 36px; height: 36px; border: 2px solid transparent; outline: 1px solid var(--kart-kenar); outline-offset: 1px; }
 .renk.secili { border-color: var(--kagit); outline: 2.5px solid var(--murekkep); }
 @media (max-width: 600px) { .alan-satir { flex-wrap: wrap; } }
+
+/* Toplu seçme */
+.kutu { display: inline-grid; place-items: center; width: 26px; height: 26px; flex: none; border: 1.5px dashed var(--kenar-soluk); font: 700 15px 'Courier Prime', monospace; color: var(--kagit); }
+.isaretli .kutu { border: 1.5px solid var(--murekkep); background: var(--murekkep); }
+.durak.isaretli, .hat-satir.isaretli { background: var(--vurgu); }
+.hat-satir .kutu { width: 22px; height: 22px; font-size: 13px; }
+.eylem { position: sticky; bottom: 0; z-index: 3; display: flex; align-items: center; gap: 10px; flex-wrap: wrap; margin: 14px -4px 0; padding: 10px 12px;
+  background: var(--kagit-acik); border: 1.5px solid var(--murekkep); box-shadow: 0 -6px 16px rgba(0, 0, 0, .12); }
+.sol .eylem { position: static; margin: 10px 0 0; box-shadow: none; }
+.eylem .dugme { min-height: 40px; }
+.dugme[disabled] { opacity: .4; cursor: default; }
