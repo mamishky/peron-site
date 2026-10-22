@@ -80,3 +80,14 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .sag:empty { display: none; }
   .damga { display: none; }
 }
+
+/* Makale ekleme penceresi */
+.perde { position: fixed; inset: 0; z-index: 8; background: rgba(20, 18, 14, .55); display: grid; place-items: start center; padding: 8vh 16px 16px; overflow-y: auto; }
+.pencere { width: min(560px, 100%); background: var(--kagit); border: 1.5px solid var(--murekkep); padding: 18px 20px 20px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.pencere input { flex: 1; min-width: 0; min-height: 48px; padding: 0 12px; border: 1.5px solid var(--murekkep); background: var(--kagit-acik); color: var(--murekkep); font: 400 15px 'Courier Prime', monospace; border-radius: 0; }
+.kapat { border: 0; background: none; text-decoration: underline; min-height: 44px; padding: 0 4px; }
+.cipler { display: flex; flex-wrap: wrap; gap: 6px; }
+.cip { display: inline-flex; align-items: center; gap: 6px; min-height: 40px; padding: 0 10px; border: 1.5px solid var(--murekkep); background: transparent;
+  font: 700 12px 'Archivo Narrow', sans-serif; letter-spacing: .06em; text-transform: uppercase; }
+.cip.acik { background: var(--murekkep); color: var(--kagit); }
+.dugme[disabled] { opacity: .4; cursor: default; }

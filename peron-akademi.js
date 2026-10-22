@@ -6,7 +6,7 @@
   function esc(s) { return String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;'); }
   function up(s) { return String(s).toLocaleUpperCase('tr-TR'); }
 
-  var KINDS = { makale: 'makale', bildiri: 'bildiri', bolum: 'kitap bölümü', kitap: 'kitap', tez: 'tez', rapor: 'rapor' };
+  var KINDS = { makale: 'makale', bildiri: 'bildiri', bolum: 'kitap bölümü', kitap: 'kitap', tez: 'tez', rapor: 'rapor', proje: 'proje' };
 
   // ---- Kişiler
   function initials(given) {
@@ -44,12 +44,12 @@
   function reference(p) {
     var out = [];
     function add(s, it) { if (s) out.push({ t: s, i: !!it }); }
-    var italicTitle = ['kitap', 'tez', 'rapor'].indexOf(p.kind) >= 0;
+    var italicTitle = ['kitap', 'tez', 'rapor', 'proje'].indexOf(p.kind) >= 0;
     var year = p.year ? String(p.year) : 't.y.';
     var titleDone = false;
     var authors = p.authors || [], editors = p.editors || [];
     if (authors.length) add(closed(authorList(authors)) + ' (' + year + '). ');
-    else if (editors.length && p.kind === 'kitap') add(authorList(editors) + ' (Ed.). (' + year + '). ');
+    else if (editors.length && ['kitap', 'rapor', 'proje'].indexOf(p.kind) >= 0) add(authorList(editors) + ' (Ed.). (' + year + '). ');
     else { add(closed(p.title), italicTitle); add(' (' + year + '). '); titleDone = true; }
     var style = p.kind === 'bildiri' ? (p.volume ? 'makale' : 'bolum') : p.kind;
     if (style === 'bolum') {
@@ -60,7 +60,7 @@
       if (pages) add(' (ss. ' + pages + ')');
       if (book || pages) add('. ');
       var pub = pubIfDiff(p); if (pub) add(closed(pub) + ' ');
-    } else if (style === 'kitap' || style === 'rapor') {
+    } else if (style === 'kitap' || style === 'rapor' || style === 'proje') {
       if (!titleDone) { add(p.title, true); add('. '); }
       var pb = pubIfDiff(p); if (pb) add(closed(pb) + ' ');
     } else if (style === 'tez') {
@@ -105,7 +105,12 @@
   }
 
   function shortAuthors(p) {
-    var n = (p.authors || []).map(function (a) { return isOrg(a) ? a.name : a.family; });
+    var byEditor = !(p.authors || []).length && (p.editors || []).length;
+    var s = shortNames(byEditor ? p.editors : p.authors);
+    return byEditor && s ? s + ' (ed.)' : s;
+  }
+  function shortNames(list) {
+    var n = (list || []).map(function (a) { return isOrg(a) ? a.name : a.family; });
     if (n.length === 0) return '';
     if (n.length === 1) return n[0];
     if (n.length === 2) return n[0] + ' ve ' + n[1];
@@ -121,7 +126,7 @@
     if (b.note && b.note.trim()) out.push('Not: ' + flat(b.note));
     return out;
   }
-  var RIS_T = { bildiri: 'CPAPER', bolum: 'CHAP', kitap: 'BOOK', tez: 'THES', rapor: 'RPRT' };
+  var RIS_T = { bildiri: 'CPAPER', bolum: 'CHAP', kitap: 'BOOK', tez: 'THES', rapor: 'RPRT', proje: 'RPRT' };
   function personFull(p) { return isOrg(p) ? p.name : (p.given ? p.family + ', ' + p.given : p.family); }
   function risEntry(p, lines, back) {
     var f = [['TY', RIS_T[p.kind] || 'JOUR']];
@@ -139,6 +144,7 @@
     if (p.doi) f.push(['DO', p.doi]);
     var u = p.url || p.oaURL; if (u) f.push(['UR', u]);
     (lines || []).forEach(function (l) { f.push(['KW', l]); });
+    if (p.advisor) f.push(['N1', 'Danışman: ' + p.advisor]);
     noteLines(back).forEach(function (n) { f.push(['N1', n]); });
     f.push(['ER', '']);
     return f.map(function (kv) { return kv[0] + '  - ' + String(kv[1]).replace(/\r?\n/g, ' '); }).join('\r\n');
@@ -151,7 +157,7 @@
       return c === '\\' ? '\\textbackslash{}' : c === '~' ? '\\textasciitilde{}' : c === '^' ? '\\textasciicircum{}' : '\\' + c;
     });
   }
-  var BIB_T = { bildiri: 'inproceedings', bolum: 'incollection', kitap: 'book', rapor: 'techreport' };
+  var BIB_T = { bildiri: 'inproceedings', bolum: 'incollection', kitap: 'book', rapor: 'techreport', proje: 'misc' };
   function bibType(p) { if (p.kind === 'tez') return p.degree === 'yukseklisans' ? 'mastersthesis' : 'phdthesis'; return BIB_T[p.kind] || 'article'; }
   function fold(s) {
     var m = { 'ı': 'i', 'İ': 'I', 'ş': 's', 'Ş': 'S', 'ğ': 'g', 'Ğ': 'G', 'ç': 'c', 'Ç': 'C', 'ö': 'o', 'Ö': 'O', 'ü': 'u', 'Ü': 'U' };
@@ -186,12 +192,160 @@
     if (p.doi) f.push(['doi', p.doi]);
     var u = p.url || p.oaURL; if (u) f.push(['url', u]);
     if (lines && lines.length) f.push(['keywords', lines.map(bibEsc).join(', ')]);
-    var notes = noteLines(back); if (notes.length) f.push(['note', notes.map(bibEsc).join(' · ')]);
+    var notes = noteLines(back); if (p.advisor) notes.unshift('Danışman: ' + p.advisor); if (notes.length) f.push(['note', notes.map(bibEsc).join(' · ')]);
     return '@' + bibType(p) + '{' + key + ',\n' + f.map(function (kv) { return '  ' + kv[0] + ' = {' + kv[1] + '}'; }).join(',\n') + '\n}';
   }
   function bibFile(papers, linesOf, backs) {
     var keys = bibKeys(papers);
     return papers.map(function (p, i) { return bibEntry(p, keys[i], linesOf ? linesOf(p) : [], backs && backs[p.id]); }).join('\n\n') + '\n';
+  }
+
+
+  // ---- DOI ile makale bulma (Swift'teki DOI.swift ile aynı kurallar)
+  var CONTACT = 'destek@getperon.app';
+  function textOf(v) {
+    if (typeof v === 'string') return v.trim();
+    if (Array.isArray(v)) return v.length ? textOf(v[0]) : null;
+    if (typeof v === 'number') return String(v);
+    return null;
+  }
+  function cleanText(s) {
+    var t = String(s).replace(/<[^>]+>/g, '');
+    var ent = { '&amp;': '&', '&lt;': '<', '&gt;': '>', '&quot;': '"', '&#39;': "'", '&apos;': "'", '&nbsp;': ' ' };
+    Object.keys(ent).forEach(function (k) { t = t.split(k).join(ent[k]); });
+    return t.replace(/\s+/g, ' ').trim();
+  }
+  // "JOSÉ ARANDA" gibi tamamı büyük harf adlar düzelir. Karışık yazılmış ada dokunulmaz.
+  function fixCaps(s) {
+    if (s.length < 2 || s !== s.toUpperCase() || s === s.toLowerCase()) return s;
+    return s.split(' ').map(function (w) {
+      var turkish = /[İŞĞÜÖÇ]/.test(w);
+      return w.split('-').map(function (part) {
+        if (!part) return part;
+        var f = part[0], rest = part.slice(1);
+        return f + (turkish ? rest.toLocaleLowerCase('tr') : rest.toLowerCase());
+      }).join('-');
+    }).join(' ');
+  }
+  function cslPeople(v) {
+    if (!Array.isArray(v)) return [];
+    var out = [];
+    v.forEach(function (a) {
+      var family = fixCaps(textOf(a.family) || ''), given = fixCaps(textOf(a.given) || '');
+      if (family) out.push({ family: family, given: given });
+      else { var lit = textOf(a.name) || textOf(a.literal); if (lit) out.push({ family: '', given: '', name: lit }); }
+    });
+    return out;
+  }
+  function cslYear(m) {
+    var keys = ['issued', 'published-print', 'published-online', 'published', 'approved'];
+    for (var i = 0; i < keys.length; i++) {
+      var d = m[keys[i]], y = d && d['date-parts'] && d['date-parts'][0] && d['date-parts'][0][0];
+      if (typeof y === 'number') return y;
+    }
+    return null;
+  }
+  function cslKind(t) {
+    if (['proceedings-article', 'paper-conference'].indexOf(t) >= 0) return 'bildiri';
+    if (['book-chapter', 'chapter', 'book-section', 'book-part'].indexOf(t) >= 0) return 'bolum';
+    if (['book', 'monograph', 'edited-book', 'reference-book'].indexOf(t) >= 0) return 'kitap';
+    if (['dissertation', 'thesis'].indexOf(t) >= 0) return 'tez';
+    if (['report', 'report-component'].indexOf(t) >= 0) return 'rapor';
+    return 'makale';
+  }
+  function newId() { var s = ''; for (var i = 0; i < 8; i++) s += Math.floor(Math.random() * 16).toString(16); return 'p-' + s; }
+  function paperFromCSL(m, fallbackDOI) {
+    var raw = textOf(m.title); if (!raw) return null;
+    var title = cleanText(raw), sub = textOf(m.subtitle) ? cleanText(textOf(m.subtitle)) : '';
+    if (sub && title.indexOf(sub) < 0) title = (title.slice(-1) === ':' ? title : title + ':') + ' ' + sub;
+    title = title.replace(/^[:\s]+|[:\s]+$/g, '');
+    var doi = textOf(m.DOI) || fallbackDOI;
+    var p = { id: newId(), kind: cslKind(textOf(m.type) || ''), title: title, authors: cslPeople(m.author), editors: cslPeople(m.editor) };
+    var container = textOf(m['container-title']) ? cleanText(textOf(m['container-title'])) : '';
+    // DataCite depoları (Zenodo) yayıncıyı dergi gibi yazar
+    if (container && container !== textOf(m.publisher)) p.container = container;
+    var y = cslYear(m); if (y) p.year = y;
+    [['volume', 'volume'], ['issue', 'issue'], ['pages', 'page'], ['articleNo', 'article-number'], ['publisher', 'publisher']].forEach(function (kv) {
+      var v = textOf(m[kv[1]]); if (v) p[kv[0]] = v;
+    });
+    var inst = m.institution && m.institution[0] && m.institution[0].name;
+    if (typeof inst === 'string') p.institution = inst;
+    if (p.kind === 'tez' && !p.institution && p.publisher) p.institution = p.publisher;
+    p.doi = /^10\./.test(doi || '') ? doi : fallbackDOI;
+    var u = textOf(m.URL); if (u && u.indexOf('doi.org') < 0) p.url = u;
+    p.status = 'toread';
+    return p;
+  }
+  function extractDOI(text) {
+    var decoded = String(text); try { decoded = decodeURIComponent(decoded); } catch (e) {}
+    var re = decoded.indexOf('(SICI)') >= 0 ? /10\.\d{4,9}\/[^\s"]+/ : /10\.\d{4,9}\/[^\s"<>]+/;
+    var m = decoded.match(re); if (!m) return null;
+    var d = m[0];
+    while (d.length && '.,;:)]}\''.indexOf(d[d.length - 1]) >= 0) {
+      var last = d[d.length - 1];
+      if (last === ')' && (d.match(/\(/g) || []).length >= (d.match(/\)/g) || []).length) break;
+      d = d.slice(0, -1);
+    }
+    return d;
+  }
+  function doiPath(doi) { return encodeURIComponent(doi).replace(/%2F/gi, '/'); }
+  function getJSON(url, headers) {
+    return fetch(url, { headers: headers || {} }).then(function (r) {
+      if (r.status === 404 || r.status === 406) return null;
+      if (!r.ok) throw new Error('network');
+      return r.json();
+    });
+  }
+  function lookupDOI(text) {
+    var doi = extractDOI(text);
+    if (!doi) return Promise.reject(new Error('noDOI'));
+    return getJSON('https://api.crossref.org/works/' + doiPath(doi) + '?mailto=' + CONTACT).then(function (j) {
+      var p = j && j.message ? paperFromCSL(j.message, doi) : null;
+      if (p) return p;
+      return getJSON('https://doi.org/' + doiPath(doi), { Accept: 'application/vnd.citationstyles.csl+json' }).then(function (c) {
+        var q = c ? paperFromCSL(c, doi) : null;
+        if (!q) throw new Error('notFound');
+        return q;
+      });
+    }, function () {
+      return getJSON('https://doi.org/' + doiPath(doi), { Accept: 'application/vnd.citationstyles.csl+json' }).then(function (c) {
+        var q = c ? paperFromCSL(c, doi) : null;
+        if (!q) throw new Error('network');
+        return q;
+      });
+    });
+  }
+  function words(s) {
+    var f = fold(String(s)).toLowerCase().replace(/ı/g, 'i');
+    var out = {}; f.split(/[^a-z0-9]+/).filter(function (w) { return w.length > 2; }).forEach(function (w) { out[w] = 1; });
+    return out;
+  }
+  // DOI yokken başlıkla Crossref araması: yalnız başlığı çok yakın olan sonuç kabul edilir
+  function lookupTitle(title) {
+    return getJSON('https://api.crossref.org/works?query.bibliographic=' + encodeURIComponent(title) + '&rows=4&mailto=' + CONTACT).then(function (j) {
+      var want = words(title), wk = Object.keys(want), items = (j && j.message && j.message.items) || [];
+      for (var i = 0; i < items.length; i++) {
+        var p = paperFromCSL(items[i], items[i].DOI || ''); if (!p) continue;
+        var got = words(p.title), gk = Object.keys(got); if (!wk.length || !gk.length) continue;
+        var inter = wk.filter(function (w) { return got[w]; }).length, uni = wk.length + gk.length - inter;
+        if (inter / uni >= 0.8) return p;
+      }
+      throw new Error('notFound');
+    });
+  }
+  function openAccess(doi) {
+    return getJSON('https://api.unpaywall.org/v2/' + doiPath(doi) + '?email=' + CONTACT).then(function (o) {
+      var b = o && o.best_oa_location; return b ? (b.url_for_pdf || b.url || null) : null;
+    }, function () { return null; });
+  }
+  // Tekrar kuralı (Swift: AcademyData.duplicate): aynı DOI ya da aynı başlık + yıl
+  function normTitle(s) { return fold(String(s)).toLowerCase().replace(/ı/g, 'i').replace(/[^a-z0-9]/g, ''); }
+  function findDuplicate(data, p) {
+    var d = (p.doi || '').toLowerCase();
+    var hit = data.papers.filter(function (x) { return d && (x.doi || '').toLowerCase() === d; })[0];
+    if (hit) return hit;
+    var t = normTitle(p.title);
+    return data.papers.filter(function (x) { return t.length >= 12 && normTitle(x.title) === t && (!x.year || !p.year || x.year === p.year); })[0] || null;
   }
 
   // ---- Arayüz yardımcıları
@@ -226,5 +380,6 @@
 
   window.PA = { esc: esc, up: up, KINDS: KINDS, reference: reference, plain: plain, html: html, bibliography: bibliography, inText: inText,
     shortAuthors: shortAuthors, risFile: risFile, bibFile: bibFile, copyRich: copyRich, copyText: copyText, download: download,
-    runsToEl: runsToEl, stamp: stamp, noteLines: noteLines };
+    runsToEl: runsToEl, stamp: stamp, noteLines: noteLines,
+    extractDOI: extractDOI, lookupDOI: lookupDOI, lookupTitle: lookupTitle, openAccess: openAccess, findDuplicate: findDuplicate, paperFromCSL: paperFromCSL };
 })();

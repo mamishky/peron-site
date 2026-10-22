@@ -19,7 +19,7 @@
   <span class="logo"><img src="../img/icon-512.png" alt="">PERON</span>
   <div class="sekmeler"><span class="sekme acik">AKADEMİ</span></div>
   <span class="bosluk"></span>
-  <span class="damga" id="damga" hidden>YALNIZ OKUMA</span>
+  <span class="damga" id="damga" hidden>WEB SÜRÜMÜ</span>
   <span id="hesap" class="soluk"></span>
 </div>
 <div class="cift"><i></i><i></i></div>
@@ -32,7 +32,7 @@
   'use strict';
   var db = window.supabase.createClient('https://arxwwekjxgrgyruopvzp.supabase.co', 'sb_publishable_sPMEqz96nenj0LYJyGUB8g_4YeLFx-Z');
   var root = document.getElementById('uygulama');
-  var state = { data: null, line: null, paper: null };
+  var state = { data: null, line: null, paper: null, uid: null };
 
   function el(tag, attrs, kids) {
     var n = document.createElement(tag);
@@ -69,7 +69,7 @@
     root.replaceChildren(el('form', { class: 'giris', onsubmit: function (e) { e.preventDefault(); } }, [
       el('div', { class: 'etiket', text: 'Aynı hesapla gir' }),
       el('h1', { class: 'eser', text: 'Peron Akademi', style: 'font-size:34px;margin:6px 0 4px' }),
-      el('p', { class: 'italik soluk', text: 'Hatlarını, biletlerini ve alıntılarını bilgisayarda gör. Yalnız okuma.', style: 'font-size:18px;margin:0 0 20px' }),
+      el('p', { class: 'italik soluk', text: 'Hatlarını, biletlerini ve alıntılarını bilgisayarda gör. DOI yapıştırarak makale ekle.', style: 'font-size:18px;margin:0 0 20px' }),
       email, pass, go, err,
       el('p', { class: 'soluk', text: 'Apple ile üye olduysan web girişi için önce uygulamadan bir şifre belirle (Şifremi unuttum).', style: 'font-size:12px' })
     ]));
@@ -80,6 +80,7 @@
     db.auth.getSession().then(function (r) {
       var s = r.data && r.data.session;
       if (!s) { showLogin(); return; }
+      state.uid = s.user.id;
       document.getElementById('hesap').textContent = s.user.email + ' · ';
       var out = el('a', { href: '#', text: 'çıkış', onclick: function (e) { e.preventDefault(); db.auth.signOut().then(function () { showLogin(); }); } });
       document.getElementById('hesap').appendChild(out);
@@ -100,13 +101,134 @@
   function unlined() { var on = {}; state.data.lines.forEach(function (l) { (l.stops || []).forEach(function (s) { on[s] = 1; }); }); return state.data.papers.filter(function (p) { return !on[p.id]; }); }
   function fileName(ext, name) { return 'peron-' + (name || 'akademi').toLowerCase().replace(/[^a-z0-9çğıöşü]+/gi, '-').replace(/^-|-$/g, '') + '-' + new Date().toISOString().slice(0, 10) + '.' + ext; }
 
+
+  // ---- Makale ekleme (DOI ile)
+  function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
+  function emptyData() { return { papers: [], lines: [], backs: {} }; }
+  function normData(d) { d = d || emptyData(); d.papers = d.papers || []; d.lines = d.lines || []; d.backs = d.backs || {}; return d; }
+
+  // Telefon aynı anda yazmış olabilir: sunucudaki kaydı oku, makaleyi ekle, yalnız kayıt değişmediyse yaz (stamp karşılaştırması).
+  // Değiştiyse yeniden oku ve dene. Başka alanlara (hedefler, paylaşımlar, alıntılar) dokunulmaz.
+  function savePaper(paper, lineIDs, attempt) {
+    attempt = attempt || 0;
+    if (attempt > 3) return Promise.reject(new Error('busy'));
+    return db.from('academies').select('data,stamp').eq('user_id', state.uid).maybeSingle().then(function (q) {
+      if (q.error) throw new Error('network');
+      var row = q.data, data = normData(row && row.data);
+      var dup = PA.findDuplicate(data, paper);
+      if (dup) { var e = new Error('dup'); e.paper = dup; e.data = data; throw e; }
+      var p = JSON.parse(JSON.stringify(paper)); p.added = today(); p.status = p.status || 'toread';
+      data.papers.push(p);
+      (lineIDs || []).forEach(function (id) {
+        var l = data.lines.filter(function (x) { return x.id === id; })[0];
+        if (l) { l.stops = l.stops || []; if (l.stops.indexOf(p.id) < 0) l.stops.push(p.id); }
+      });
+      var stamp = Date.now() / 1000; if (row && stamp <= row.stamp) stamp = row.stamp + 0.001;
+      var done = function () { state.data = data; return p; };
+      if (!row) {
+        return db.from('academies').insert({ user_id: state.uid, data: data, stamp: stamp }).then(function (r) {
+          if (r.error) return savePaper(paper, lineIDs, attempt + 1);
+          return done();
+        });
+      }
+      return db.from('academies').update({ data: data, stamp: stamp }).eq('user_id', state.uid).eq('stamp', row.stamp).select('stamp').then(function (r) {
+        if (r.error) throw new Error('network');
+        if (!r.data || !r.data.length) return savePaper(paper, lineIDs, attempt + 1);
+        return done();
+      });
+    });
+  }
+
+  function openAdd() {
+    var chosen = {}; if (state.line && state.line !== '__un') chosen[state.line] = 1;
+    var found = null, busy = false;
+    var input = el('input', { type: 'text', placeholder: 'DOI, doi.org bağlantısı ya da makalenin adı', autocomplete: 'off', spellcheck: 'false' });
+    var msg = el('p', { class: 'hata', style: 'min-height:20px;margin:8px 0 0' });
+    var card = el('div'), chips = el('div', { class: 'cipler' });
+    var save = el('button', { class: 'dugme', text: 'Perona koy', disabled: 'disabled' });
+    var go = el('button', { class: 'dugme bos', text: 'Ara' });
+    var perde = el('div', { class: 'perde' });
+    function close() { perde.remove(); document.removeEventListener('keydown', esc); }
+    function esc(e) { if (e.key === 'Escape') close(); }
+    document.addEventListener('keydown', esc);
+    perde.addEventListener('mousedown', function (e) { if (e.target === perde) close(); });
+
+    function drawChips() {
+      chips.replaceChildren();
+      if (!state.data.lines.length) { chips.appendChild(el('span', { class: 'soluk', text: 'Henüz hat yok. Makale hatsız eklenir.' })); return; }
+      state.data.lines.forEach(function (l) {
+        chips.appendChild(el('button', { class: 'cip' + (chosen[l.id] ? ' acik' : ''), onclick: function () { if (chosen[l.id]) delete chosen[l.id]; else chosen[l.id] = 1; drawChips(); } }, [
+          el('span', { class: 'rozet', text: PA.up((l.name || '?').charAt(0)), style: 'background:' + tint(l.color) + ';width:16px;height:16px;font-size:10px' }), l.name]));
+      });
+    }
+    function drawCard(p, dup) {
+      card.replaceChildren();
+      if (!p) return;
+      var who = (p.authors || []).map(function (a) { return a.name || (a.given ? a.given + ' ' + a.family : a.family); }).join(', ') ||
+        ((p.editors || []).length ? (p.editors.map(function (a) { return a.name || (a.given ? a.given + ' ' + a.family : a.family); }).join(', ') + ' (ed.)') : '');
+      card.appendChild(el('div', { class: 'kart', style: 'margin:14px 0' }, [el('div', { class: 'blok' }, [
+        el('div', { class: 'etiket', text: (PA.KINDS[p.kind] || 'makale') + (p.year ? ' · ' + p.year : '') + (dup ? ' · ZATEN PERONDA' : ' · BULUNDU') }),
+        el('div', { class: 'eser', style: 'font-size:21px;line-height:1.15;margin:4px 0', text: p.title }),
+        el('div', { text: who }),
+        p.container ? el('i', { class: 'italik', style: 'font-size:16px', text: p.container }) : null,
+        p.doi ? el('div', { class: 'soluk', style: 'font-size:12px;word-break:break-all', text: 'DOI ' + p.doi }) : null])]));
+    }
+    function search() {
+      var t = input.value.trim(); if (!t || busy) return;
+      busy = true; msg.textContent = ''; found = null; save.disabled = true; drawCard(null);
+      go.textContent = 'Aranıyor…';
+      var job = PA.extractDOI(t) ? PA.lookupDOI(t) : PA.lookupTitle(t);
+      job.then(function (p) {
+        var dup = PA.findDuplicate(state.data, p);
+        found = p; drawCard(p, dup);
+        if (dup) {
+          var where = state.data.lines.filter(function (l) { return (l.stops || []).indexOf(dup.id) >= 0; }).map(function (l) { return l.name; });
+          msg.textContent = 'Bu makale zaten akademinde' + (where.length ? ': ' + where.join(', ') + ' hattında.' : ' (hatsız).');
+        } else {
+          save.disabled = false;
+          PA.openAccess(p.doi || '').then(function (u) { if (u && found === p) p.oaURL = u; });
+        }
+      }).catch(function (e) {
+        msg.textContent = e.message === 'noDOI' ? 'DOI bulunamadı.' : e.message === 'network' ? 'Bağlantı kurulamadı. Biraz sonra yeniden dene.' : 'Makale bulunamadı. DOI’yi ya da adı kontrol et.';
+      }).then(function () { busy = false; go.textContent = 'Ara'; });
+    }
+    function put() {
+      if (!found || save.disabled) return;
+      save.disabled = true; save.textContent = 'Kaydediliyor…'; msg.textContent = '';
+      savePaper(found, Object.keys(chosen)).then(function (p) {
+        close(); var first = Object.keys(chosen)[0];
+        state.line = first || '__un'; state.paper = p.id; render(); toast('PERONDA', PA.up(p.title.slice(0, 28)));
+      }).catch(function (e) {
+        save.textContent = 'Perona koy';
+        if (e.message === 'dup') { state.data = e.data; msg.textContent = 'Bu makale zaten akademinde.'; return; }
+        save.disabled = false;
+        msg.textContent = e.message === 'busy' ? 'Kayıt başka yerden değişiyor. Yeniden dene.' : 'Kaydedilemedi. Bağlantını kontrol edip yeniden dene.';
+      });
+    }
+    go.addEventListener('click', search); save.addEventListener('click', put);
+    input.addEventListener('keydown', function (e) { if (e.key === 'Enter') search(); });
+    input.addEventListener('paste', function () { setTimeout(function () { if (PA.extractDOI(input.value)) search(); }, 0); });
+    drawChips();
+    perde.appendChild(el('div', { class: 'pencere', role: 'dialog', 'aria-label': 'Makale ekle' }, [
+      el('div', { style: 'display:flex;justify-content:space-between;align-items:center' }, [el('div', { class: 'etiket', text: 'Yeni kaynak' }), el('button', { class: 'kapat', text: 'Vazgeç', onclick: close })]),
+      el('h2', { class: 'eser', text: 'Makale ekle', style: 'font-size:30px;margin:4px 0 12px' }),
+      el('div', { style: 'display:flex;gap:8px' }, [input, go]),
+      msg, card,
+      el('div', { class: 'etiket', text: 'Hangi hatta', style: 'margin:6px 0' }), chips,
+      el('div', { style: 'margin-top:18px' }, [save]),
+      el('p', { class: 'soluk', style: 'font-size:12px;margin:12px 0 0', text: 'Telefondaki Peron kaydı birkaç saniyede güncellenir. Tez, kitap ve elle ekleme uygulamada.' })
+    ]));
+    document.body.appendChild(perde); input.focus();
+  }
+
   // ---- Çizim
   function render() {
     var d = state.data;
     if (!d.papers.length && !d.lines.length) {
       root.replaceChildren(el('div', { class: 'giris' }, [
         el('h1', { class: 'eser', text: 'Henüz hat yok.', style: 'font-size:34px' }),
-        el('p', { class: 'soluk', text: 'Uygulamada bir araştırma hattı aç. Burada görünür.' })])); return;
+        el('p', { class: 'soluk', text: 'Uygulamada bir araştırma hattı aç ya da buradan DOI ile makale ekle.' }),
+        el('button', { class: 'dugme', text: '+ Makale ekle', onclick: openAdd })])); return;
     }
     var year = new Date().getFullYear();
     var arrived = d.papers.filter(function (p) { return p.status === 'read' && String(p.date || '').indexOf(String(year)) === 0; }).length;
@@ -114,6 +236,7 @@
       el('div', { class: 'kart', style: 'padding:10px 12px;transform:rotate(-1.2deg);margin-bottom:10px' }, [
         el('div', { class: 'etiket', text: 'Sefer defteri' }),
         el('div', { style: 'font-weight:700;font-size:12px', text: year + ' · ' + arrived + ' MAKALE · ' + d.lines.length + ' HAT' })]),
+      el('button', { class: 'dugme', text: '+ Makale ekle', onclick: openAdd, style: 'width:100%;margin-bottom:8px' }),
       el('div', { class: 'etiket', text: 'Hatlar', style: 'margin:6px 0' })
     ]);
     d.lines.forEach(function (l) {
