@@ -50,6 +50,11 @@
   function tint(hex) { return hex || '#6e6350'; }
 
   // ---- Giriş
+  function appleLogin() {
+    db.auth.signInWithOAuth({ provider: 'apple', options: { redirectTo: location.origin + location.pathname } }).then(function (r) {
+      if (r.error) showLogin('Apple ile giriş başlatılamadı. Biraz sonra yeniden dene.');
+    });
+  }
   function showLogin(msg) {
     document.getElementById('hesap').textContent = ''; document.getElementById('damga').hidden = true;
     var email = el('input', { type: 'email', autocomplete: 'username', inputmode: 'email', placeholder: 'e-posta' });
@@ -71,7 +76,9 @@
       el('h1', { class: 'eser', text: 'Peron Akademi', style: 'font-size:34px;margin:6px 0 4px' }),
       el('p', { class: 'italik soluk', text: 'Hatlarını, biletlerini ve alıntılarını bilgisayarda gör. DOI yapıştırarak makale ekle.', style: 'font-size:18px;margin:0 0 20px' }),
       email, pass, go, err,
-      el('p', { class: 'soluk', text: 'Apple ile üye olduysan web girişi için önce uygulamadan bir şifre belirle (Şifremi unuttum).', style: 'font-size:12px' })
+      el('div', { class: 'etiket', text: 'ya da', style: 'text-align:center;margin:14px 0 10px' }),
+      el('button', { class: 'dugme bos', type: 'button', style: 'width:100%', text: ' Apple ile gir', onclick: appleLogin }),
+      el('p', { class: 'soluk', text: 'Apple ile üye olduysan aynı hesaba girersin. Girişte bir sorun olursa uygulamadan Şifremi unuttum ile bir şifre de belirleyebilirsin.', style: 'font-size:12px;margin-top:14px' })
     ]));
   }
 
