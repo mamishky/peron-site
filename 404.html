@@ -1,0 +1,117 @@
+<!doctype html>
+<html lang="tr">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<meta name="referrer" content="no-referrer">
+<title>Peron</title>
+<meta name="theme-color" content="#f4ecd8" media="(prefers-color-scheme: light)">
+<meta name="theme-color" content="#28241e" media="(prefers-color-scheme: dark)">
+<link rel="icon" href="/img/icon-512.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
+<link rel="stylesheet" href="/peron-akademi.css">
+<style>
+  .bin { background: var(--kagit-acik); border-bottom: 1.5px solid var(--murekkep); padding: 10px 16px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; }
+  .bin .metin { flex: 1; min-width: 180px; font-size: 13px; }
+  .govde { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; }
+  .iki { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 500px); gap: 32px; align-items: start; }
+  .sek { display: none; }
+  @media (max-width: 800px) {
+    .iki { display: block; }
+    .sek { display: flex; gap: 4px; margin: 14px 0 0; }
+    .sek button { flex: 1; min-height: 44px; border: 1.5px solid var(--murekkep); background: transparent; font: 700 12px 'Archivo Narrow', sans-serif; letter-spacing: .14em; }
+    .sek button.acik { background: var(--murekkep); color: var(--kagit); }
+    .iki > section { display: none; } .iki > section.acik { display: block; }
+  }
+</style>
+</head>
+<body>
+<div class="bin" id="bin" hidden>
+  <span class="logo">PERON</span>
+  <span class="metin">Bu hattı kendi akademine kopyala.</span>
+  <a class="dugme" id="katil" href="#">Hatta bin</a>
+</div>
+<main class="govde" id="uygulama"><p class="soluk">Yükleniyor…</p></main>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
+<script src="/peron-akademi.js"></script>
+<script>
+(function () {
+  'use strict';
+  var root = document.getElementById('uygulama');
+  // /h/KOD  (GitHub Pages bilinmeyen yolları 404.html ile karşılar, o sayfa da bu kodu çalıştırır)
+  var m = location.pathname.match(/\/h\/([A-Za-z0-9]{4,8})\/?$/);
+  var code = m ? m[1].toUpperCase() : null;
+
+  function el(tag, attrs, kids) {
+    var n = document.createElement(tag);
+    Object.keys(attrs || {}).forEach(function (k) {
+      if (k === 'class') n.className = attrs[k]; else if (k === 'text') n.textContent = attrs[k];
+      else if (k.slice(0, 2) === 'on') n.addEventListener(k.slice(2), attrs[k]); else n.setAttribute(k, attrs[k]);
+    });
+    (kids || []).forEach(function (c) { if (c) n.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+    return n;
+  }
+  function none(msg) { root.replaceChildren(el('div', { class: 'bos-not' }, [el('h1', { class: 'eser', text: 'Bu bağlantı çalışmıyor.', style: 'font-size:28px;margin:0 0 6px' }), el('p', { text: msg || 'Sahibi paylaşımı kapatmış olabilir.' })])); }
+  if (!code) { root.replaceChildren(el('div', { class: 'bos-not' }, [el('h1', { class: 'eser', text: 'Sayfa bulunamadı.', style: 'font-size:28px;margin:0 0 6px' }), el('a', { href: '/', text: 'getperon.app' })])); return; }
+
+  var db = window.supabase.createClient('https://arxwwekjxgrgyruopvzp.supabase.co', 'sb_publishable_sPMEqz96nenj0LYJyGUB8g_4YeLFx-Z');
+  db.rpc('get_shared_line', { p_code: code, p_count: true }).then(function (r) {
+    if (r.error) { none('Bağlantı kurulamadı. Sayfayı yenile.'); return; }
+    if (!r.data) { none(); return; }
+    show(r.data.snapshot, r.data.notes_open);
+  });
+
+  var STATUS = { read: 'okundu', reading: 'okunuyor', toread: '' };
+
+  function show(s, notes) {
+    var bin = document.getElementById('bin'); bin.hidden = false;
+    document.getElementById('katil').href = 'https://getperon.app/h/' + code;
+    document.getElementById('katil').addEventListener('click', function (e) {
+      // Uygulama yüklüyse evrensel bağlantı açar. Yoksa mağazaya git.
+      e.preventDefault();
+      var t = setTimeout(function () { location.href = 'https://apps.apple.com/app/id6821673488'; }, 1200);
+      window.addEventListener('pagehide', function () { clearTimeout(t); }, { once: true });
+      location.href = 'peron://h/' + code;
+    });
+    var ps = s.papers || [], read = ps.filter(function (p) { return p.status === 'read'; }).length;
+    var backs = s.backs || {};
+    var refs = PA.bibliography(ps);
+    var left = el('section', { class: 'acik' }, [
+      el('div', { style: 'border-top:1.5px solid var(--murekkep)' }, ps.map(function (p, i) {
+        var b = backs[p.id];
+        return el('div', { class: 'durak', style: 'grid-template-columns:36px minmax(0,1fr) auto;cursor:default' }, [
+          el('span', { class: 'no', text: ('0' + (i + 1)).slice(-2) }),
+          el('span', {}, [el('span', { class: 'baslik', text: p.title }), el('br'),
+            el('span', { class: 'meta', text: [PA.shortAuthors(p), p.year].filter(Boolean).join(' · ') }),
+            notes && b && (b.quotes || []).length ? el('div', { style: 'margin-top:6px' }, b.quotes.map(function (q) { return el('div', { class: 'italik', style: 'font-size:15px;margin:3px 0', text: '“' + q.text + '”' + (q.page ? ' (s. ' + q.page + ')' : '') }); })) : null,
+            notes && b && (b.note || '').trim() ? el('div', { style: 'border-left:2px solid var(--mercan);padding-left:10px;margin:6px 0;white-space:pre-wrap;font-size:13px', text: b.note }) : null]),
+          el('span', { class: p.status === 'reading' ? 'mavi' : 'soluk', text: STATUS[p.status] || '', style: 'font-size:12px' })]);
+      }))
+    ]);
+    var right = el('section', {}, [
+      el('div', { class: 'etiket', text: 'Kaynakça · APA 7 · ' + refs.length + ' kaynak' }),
+      el('div', { style: 'display:flex;gap:8px;flex-wrap:wrap;margin:10px 0' }, [
+        el('button', { class: 'dugme', text: 'Tümünü kopyala', onclick: function (e) { PA.copyRich(refs).then(function () { e.target.textContent = 'Kopyalandı ✓'; setTimeout(function () { e.target.textContent = 'Tümünü kopyala'; }, 1200); }); } }),
+        el('button', { class: 'dugme bos', text: '.ris', onclick: function () { PA.download('peron-hat.ris', PA.risFile(ps, function () { return [s.name]; }, notes ? backs : null)); } }),
+        el('button', { class: 'dugme bos', text: '.bib', onclick: function () { PA.download('peron-hat.bib', PA.bibFile(ps, function () { return [s.name]; }, notes ? backs : null)); } })]),
+      el('div', { class: 'kart kaynakca', style: 'padding:14px' }, refs.map(function (r) { return el('p', {}, [PA.runsToEl(r)]); }))
+    ]);
+    var tabL = el('button', { class: 'acik', text: 'Duraklar' }), tabR = el('button', { text: 'Kaynakça' });
+    tabL.addEventListener('click', function () { tabL.className = 'acik'; tabR.className = ''; left.className = 'acik'; right.className = ''; });
+    tabR.addEventListener('click', function () { tabR.className = 'acik'; tabL.className = ''; right.className = 'acik'; left.className = ''; });
+    document.title = 'Peron · ' + s.name;
+    root.replaceChildren(
+      el('div', { class: 'etiket', text: 'Paylaşılan hat · Akademi' }),
+      el('h1', { text: PA.up(s.name), style: "font:700 40px/1.05 'Archivo Narrow',sans-serif;margin:4px 0 6px;border-left:6px solid " + (s.color || '#6e6350') + ';padding-left:12px' }),
+      el('div', { class: 'italik', style: 'font-size:18px', text: ps.length + ' durak · ' + read + ' okundu' }),
+      el('div', { class: 'cift', style: 'margin:14px 0 0' }, [el('i'), el('i')]),
+      el('div', { class: 'sek' }, [tabL, tabR]),
+      el('div', { class: 'iki', style: 'margin-top:18px' }, [left, right]));
+  }
+})();
+</script>
+</body>
+</html>
