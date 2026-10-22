@@ -104,3 +104,34 @@ button { font: inherit; color: inherit; cursor: pointer; }
   .harita-ust { padding: 14px 16px; }
   .harita-alan { max-height: 70vh; }
 }
+
+/* Düzenleme: formlar, arama, sıralama, yolculuk */
+.pencere.genis { width: min(680px, 100%); }
+.pencere textarea, .pencere select, .alinti-form textarea, .yolculuk input[type=date] {
+  width: 100%; padding: 8px 10px; border: 1.5px solid var(--murekkep); background: var(--kagit-acik); color: var(--murekkep); font: 400 14px 'Courier Prime', monospace; border-radius: 0; }
+.pencere textarea, .alinti-form textarea, .sag textarea { resize: vertical; line-height: 1.4; }
+.sag textarea { width: 100%; padding: 8px 10px; border: 1.5px solid var(--murekkep); background: var(--kagit-acik); color: var(--murekkep); font: 400 14px 'Courier Prime', monospace; border-radius: 0; }
+.pencere input[type=file] { width: 100%; min-height: 48px; padding: 10px 0; font: inherit; color: var(--murekkep); }
+.pencere select { min-height: 44px; }
+.alan { display: block; margin: 0 0 12px; }
+.alan > .etiket { display: block; margin-bottom: 4px; }
+.alan small { display: block; margin-top: 3px; font-size: 12px; }
+.alan input { width: 100%; }
+.alan-satir { display: flex; gap: 10px; }
+.alan-satir .alan { flex: 1; min-width: 0; }
+.ara { width: 100%; min-height: 44px; padding: 0 12px; border: 1.5px solid var(--murekkep); background: var(--kagit-acik); color: var(--murekkep); font: 400 14px 'Courier Prime', monospace; border-radius: 0; }
+.durak-satir { display: grid; grid-template-columns: minmax(0, 1fr) auto; align-items: center; border-bottom: 1px solid var(--kart-kenar); }
+.durak-satir .durak { border-bottom: 0; }
+.siralama { display: flex; opacity: .35; transition: opacity .1s; }
+.durak-satir:hover .siralama, .durak-satir:focus-within .siralama { opacity: 1; }
+.siralama button { width: 34px; min-height: 44px; border: 0; background: none; font-size: 17px; }
+.siralama button:hover { color: var(--mercan); }
+.yolculuk { border: 1.5px solid var(--kenar-soluk); padding: 10px 12px; margin: 0 0 4px; }
+.yolculuk .satir { display: flex; align-items: center; gap: 10px; margin: 8px 0 0; flex-wrap: wrap; }
+.yolculuk .satir > .soluk { min-width: 52px; font-size: 12px; }
+.yolculuk input[type=date] { width: auto; min-height: 40px; padding: 4px 8px; }
+.yildiz button { border: 0; background: none; font-size: 22px; line-height: 1; min-width: 32px; min-height: 40px; color: var(--mercan); }
+.alinti-form { padding: 8px 0; }
+.renk { width: 36px; height: 36px; border: 2px solid transparent; outline: 1px solid var(--kart-kenar); outline-offset: 1px; }
+.renk.secili { border-color: var(--kagit); outline: 2.5px solid var(--murekkep); }
+@media (max-width: 600px) { .alan-satir { flex-wrap: wrap; } }
