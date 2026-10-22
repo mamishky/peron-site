@@ -91,3 +91,16 @@ button { font: inherit; color: inherit; cursor: pointer; }
   font: 700 12px 'Archivo Narrow', sans-serif; letter-spacing: .06em; text-transform: uppercase; }
 .cip.acik { background: var(--murekkep); color: var(--kagit); }
 .dugme[disabled] { opacity: .4; cursor: default; }
+
+/* Harita */
+.sekme { cursor: pointer; font-family: 'Archivo Narrow', sans-serif; }
+.harita-sayfa { display: grid; grid-template-columns: minmax(0, 1fr) 440px; min-height: calc(100vh - 80px); }
+.harita-sol { min-width: 0; display: flex; flex-direction: column; }
+.harita-ust { padding: 20px 32px 14px; border-bottom: 1px solid var(--kart-kenar); background: var(--kagit); }
+.harita-alan { flex: 1; overflow: auto; max-height: calc(100vh - 240px); padding: 8px 12px 24px;
+  background-image: radial-gradient(var(--kart-kenar) 1.2px, transparent 1.4px); background-size: 24px 24px; }
+@media (max-width: 900px) {
+  .harita-sayfa { display: block; }
+  .harita-ust { padding: 14px 16px; }
+  .harita-alan { max-height: 70vh; }
+}

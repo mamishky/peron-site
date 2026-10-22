@@ -348,6 +348,61 @@
     return data.papers.filter(function (x) { return t.length >= 12 && normTitle(x.title) === t && (!x.year || !p.year || x.year === p.year); })[0] || null;
   }
 
+
+  // ---- Harita düzeni (Swift: AcademyMapLayout ile aynı kurallar)
+  // Şerit sırası: en kalabalık hat önce, sonra en çok ortak makalesi olan komşu.
+  // Satır: her makale için en uzun yol derinliği, aynı makale her şeritte aynı satırda.
+  function mapLayout(data) {
+    var byId = {}; data.papers.forEach(function (p) { byId[p.id] = p; });
+    var left = data.lines.filter(function (l) { return (l.stops || []).length; }), order = [];
+    if (left.length) {
+      var first = left.reduce(function (a, b) { return b.stops.length > a.stops.length ? b : a; });
+      order.push(first); left = left.filter(function (l) { return l.id !== first.id; });
+    }
+    function common(a, b) { return a.stops.filter(function (s) { return b.stops.indexOf(s) >= 0; }).length; }
+    while (left.length) {
+      var last = order[order.length - 1], next = left[0];
+      left.forEach(function (l) { if (common(l, last) > common(next, last)) next = l; });
+      order.push(next); left = left.filter(function (l) { return l.id !== next.id; });
+    }
+    var preds = {}, succ = {}, ids = [];
+    order.forEach(function (l) {
+      var ps = l.stops.filter(function (id) { return byId[id]; });
+      ps.forEach(function (id, i) {
+        if (!preds[id]) { preds[id] = {}; succ[id] = {}; ids.push(id); }
+        if (i > 0) { preds[id][ps[i - 1]] = 1; succ[ps[i - 1]][id] = 1; }
+      });
+    });
+    var row = {}, indeg = {}, queue = [];
+    ids.forEach(function (id) { indeg[id] = Object.keys(preds[id]).length; if (!indeg[id]) queue.push(id); });
+    while (queue.length) {
+      var id = queue.shift(), m = -1;
+      Object.keys(preds[id]).forEach(function (p) { if (row[p] !== undefined && row[p] > m) m = row[p]; });
+      row[id] = m + 1;
+      Object.keys(succ[id]).forEach(function (s) { indeg[s]--; if (indeg[s] === 0) queue.push(s); });
+    }
+    var nxt = Object.keys(row).reduce(function (a, k) { return Math.max(a, row[k]); }, -1) + 1;
+    ids.forEach(function (id) { if (row[id] === undefined) row[id] = nxt++; });
+    var nodes = ids.map(function (id) {
+      var lanes = [];
+      order.forEach(function (l, i) { var k = l.stops.indexOf(id); if (k >= 0) lanes.push({ lane: i, no: k + 1 }); });
+      return { paper: byId[id], row: row[id] || 0, lanes: lanes, transfer: lanes.length > 1 };
+    });
+    var on = {}; data.lines.forEach(function (l) { (l.stops || []).forEach(function (s) { on[s] = 1; }); });
+    return { lines: order, nodes: nodes, rows: Object.keys(row).reduce(function (a, k) { return Math.max(a, row[k]); }, -1) + 1,
+      unlined: data.papers.filter(function (p) { return !on[p.id]; }) };
+  }
+  // Gece baskısında hat rengi açılır (Swift: mixHex(color, 0.35))
+  function mixHex(hex, w) {
+    var n = parseInt(String(hex).replace('#', ''), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    function m(v) { return Math.round(v + (255 - v) * w); }
+    return '#' + [m(r), m(g), m(b)].map(function (v) { return ('0' + v.toString(16)).slice(-2); }).join('');
+  }
+  function textOn(hex) {
+    var n = parseInt(String(hex).replace('#', ''), 16), r = (n >> 16) & 255, g = (n >> 8) & 255, b = n & 255;
+    return 0.299 * r / 255 + 0.587 * g / 255 + 0.114 * b / 255 > 0.6 ? '#2b2721' : '#f4ecd8';
+  }
+
   // ---- Arayüz yardımcıları
   function copyRich(runsList) {
     var txt = runsList.map(plain).join('\n'), h = runsList.map(function (r) { return '<p>' + html(r) + '</p>'; }).join('\n');
@@ -381,5 +436,6 @@
   window.PA = { esc: esc, up: up, KINDS: KINDS, reference: reference, plain: plain, html: html, bibliography: bibliography, inText: inText,
     shortAuthors: shortAuthors, risFile: risFile, bibFile: bibFile, copyRich: copyRich, copyText: copyText, download: download,
     runsToEl: runsToEl, stamp: stamp, noteLines: noteLines,
+    mapLayout: mapLayout, mixHex: mixHex, textOn: textOn,
     extractDOI: extractDOI, lookupDOI: lookupDOI, lookupTitle: lookupTitle, openAccess: openAccess, findDuplicate: findDuplicate, paperFromCSL: paperFromCSL };
 })();
