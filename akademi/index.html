@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
-<link rel="stylesheet" href="../peron-akademi.css?v=4">
+<link rel="stylesheet" href="../peron-akademi.css?v=5">
 </head>
 <body>
 <div class="ust">
@@ -26,7 +26,7 @@
 <main id="uygulama"></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="../peron-akademi.js?v=4"></script>
+<script src="../peron-akademi.js?v=5"></script>
 <script>
 (function () {
   'use strict';
@@ -115,6 +115,7 @@
   function normData(d) { d = d || emptyData(); d.papers = d.papers || []; d.lines = d.lines || []; d.backs = d.backs || {}; return d; }
 
   // Telefon aynı anda yazmış olabilir: sunucudaki kaydı oku, makaleyi ekle, yalnız kayıt değişmediyse yaz (stamp karşılaştırması).
+  // Kesin eşitlik yerine ±0,01 sn aralığı: ondalık sayı sunucuda kesinlik kaybedebilir, telefon yazışları ise saniyelerce uzaktır.
   // Değiştiyse yeniden oku ve dene. Başka alanlara (hedefler, paylaşımlar, alıntılar) dokunulmaz.
   function savePaper(paper, lineIDs, attempt) {
     attempt = attempt || 0;
@@ -130,7 +131,7 @@
         var l = data.lines.filter(function (x) { return x.id === id; })[0];
         if (l) { l.stops = l.stops || []; if (l.stops.indexOf(p.id) < 0) l.stops.push(p.id); }
       });
-      var stamp = Date.now() / 1000; if (row && stamp <= row.stamp) stamp = row.stamp + 0.001;
+      var stamp = Date.now() / 1000; if (row && stamp <= row.stamp + 0.05) stamp = row.stamp + 0.05;
       var done = function () { state.data = data; return p; };
       if (!row) {
         return db.from('academies').insert({ user_id: state.uid, data: data, stamp: stamp }).then(function (r) {
@@ -138,7 +139,7 @@
           return done();
         });
       }
-      return db.from('academies').update({ data: data, stamp: stamp }).eq('user_id', state.uid).eq('stamp', row.stamp).select('stamp').then(function (r) {
+      return db.from('academies').update({ data: data, stamp: stamp }).eq('user_id', state.uid).gte('stamp', row.stamp - 0.01).lte('stamp', row.stamp + 0.01).select('stamp').then(function (r) {
         if (r.error) throw new Error('network');
         if (!r.data || !r.data.length) return savePaper(paper, lineIDs, attempt + 1);
         return done();
