@@ -12,7 +12,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Archivo+Narrow:wght@700&family=Courier+Prime:wght@400;700&family=Crimson+Pro:ital,wght@0,400;0,600;1,400&display=swap">
-<link rel="stylesheet" href="../peron-akademi.css">
+<link rel="stylesheet" href="../peron-akademi.css?v=3">
 </head>
 <body>
 <div class="ust">
@@ -26,7 +26,7 @@
 <main id="uygulama"></main>
 
 <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2.45.4/dist/umd/supabase.min.js"></script>
-<script src="../peron-akademi.js"></script>
+<script src="../peron-akademi.js?v=3"></script>
 <script>
 (function () {
   'use strict';
@@ -147,6 +147,7 @@
   }
 
   function openAdd() {
+    var old = document.querySelector('.perde'); if (old) { var i0 = old.querySelector('input'); if (i0) i0.focus(); return; }
     var chosen = {}; if (state.line && state.line !== '__un') chosen[state.line] = 1;
     var found = null, busy = false;
     var input = el('input', { type: 'text', placeholder: 'DOI, doi.org bağlantısı ya da makalenin adı', autocomplete: 'off', spellcheck: 'false' });
