@@ -25,7 +25,7 @@
     var t = el('div', { class: 'tost' }, [l1, el('small', { text: l2 || '' })]);
     document.body.appendChild(t); setTimeout(function () { t.remove(); }, 1300);
   }
-  function tint(hex) { return hex || '#6e6350'; }
+  function tint(hex) { return PA.safeColor(hex); }
   function hex7() { var s = ''; for (var i = 0; i < 7; i++) s += Math.floor(Math.random() * 16).toString(16); return s; }
   function today() { var d = new Date(); return d.getFullYear() + '-' + ('0' + (d.getMonth() + 1)).slice(-2) + '-' + ('0' + d.getDate()).slice(-2); }
   function emptyData() { return { papers: [], lines: [], backs: {} }; }
@@ -266,7 +266,7 @@
       el('div', { style: 'display:flex;justify-content:space-between;align-items:center' }, [el('div', { class: 'etiket', text: label }), el('button', { class: 'kapat', text: 'Vazgeç', onclick: close })]),
       el('h2', { class: 'eser', text: heading, style: 'font-size:30px;margin:4px 0 12px' })].concat(kids));
     function close() { perde.remove(); document.removeEventListener('keydown', esc); openModals = openModals.filter(function (m) { return m !== close; }); }
-    function esc(e) { if (e.key === 'Escape' && openModals[openModals.length - 1] === close) close(); }
+    function esc(e) { if (e.key === 'Escape' && !opts.sticky && openModals[openModals.length - 1] === close) close(); }
     document.addEventListener('keydown', esc); openModals.push(close);
     perde.addEventListener('mousedown', function (e) { if (e.target === perde && !opts.sticky) close(); });
     perde.appendChild(win); document.body.appendChild(perde);
@@ -396,7 +396,7 @@
   function renderMap() {
     var d = state.data, m = PA.mapLayout(d), year = new Date().getFullYear();
     var dark = window.matchMedia && matchMedia('(prefers-color-scheme: dark)').matches;
-    function col(l) { var c = l.color || '#6e6350'; return dark ? PA.mixHex(c, 0.35) : c; }
+    function col(l) { var c = PA.safeColor(l.color); return dark ? PA.mixHex(c, 0.35) : c; }
     var LW = 190, RH = 72, TOP = 58, SIDE = 28;
     function x(lane) { return SIDE + LW * lane + 30; }
     function y(row) { return TOP + row * RH + 14; }
@@ -435,7 +435,7 @@
       }
       if (state.labels) {
         var lines = wrapTitle(n.paper.title, 24), tx = maxX + 32;
-        var t = sv('text', { x: tx, y: cy - (lines.length > 1 ? 5 : -4), fill: st === 'onway' ? 'var(--mavi)' : st === 'arrived' ? 'var(--murekkep)' : 'var(--soluk)', style: "font:700 12px 'Archivo Narrow',sans-serif;pointer-events:none" });
+        var t = sv('text', { x: tx, y: cy - (lines.length > 1 ? 5 : -4), fill: st === 'onway' ? 'var(--mavi)' : st === 'arrived' ? 'var(--murekkep)' : 'var(--soluk)', style: "font:700 12px 'Archivo Narrow',sans-serif" });
         lines.forEach(function (s, i) { t.appendChild(sv('tspan', { x: tx, dy: i ? 14 : 0, text: s })); });
         g.appendChild(t);
       }
@@ -646,8 +646,8 @@
     function draw(v) { box.replaceChildren(); for (var i = 1; i <= 5; i++) (function (n) { box.appendChild(el('button', { type: 'button', text: n <= v ? '★' : '☆', 'aria-label': n + ' yıldız', onclick: function () { v = (v === n ? 0 : n); draw(v); onpick(v); } })); })(i); }
     draw(value || 0); return box;
   }
-  function dateInput(value, onchange) {
-    return el('input', { type: 'date', value: value || '', onchange: function (e) { onchange(e.target.value); } });
+  function dateInput(value, onchange, label) {
+    return el('input', { type: 'date', 'aria-label': label || 'Tarih', value: value || '', onchange: function (e) { onchange(e.target.value); } });
   }
   function tripBlock(p) {
     var st = p.status || 'toread', box = el('div', { class: 'yolculuk' });
@@ -655,20 +655,20 @@
     if (st === 'toread') {
       var dep = today();
       box.appendChild(el('div', { class: 'etiket', text: 'Peronda' }));
-      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Kalkış' }), dateInput(dep, function (v) { dep = v || today(); }),
+      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Kalkış' }), dateInput(dep, function (v) { dep = v || today(); }, 'Kalkış tarihi'),
         el('button', { class: 'dugme', text: 'Yola çık', onclick: function () { go(ops.trip(p.id, { status: 'reading', dep: dep, date: null }), ['YOLDA', PA.stamp(dep)]); } })]));
     } else if (st === 'reading') {
       var arr = today(), stars = 0;
-      box.appendChild(el('div', { class: 'etiket', text: 'Yolda', style: 'color:var(--mavi)' }));
-      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Kalkış' }), dateInput(p.dep, function (v) { go(ops.trip(p.id, { dep: v || null })); })]));
-      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Varış' }), dateInput(arr, function (v) { arr = v || today(); }), starPicker(0, function (v) { stars = v; })]));
+      box.appendChild(el('div', { class: 'etiket', text: 'Yolda', style: 'color:var(--mavi-t)' }));
+      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Kalkış' }), dateInput(p.dep, function (v) { go(ops.trip(p.id, { dep: v || null })); }, 'Kalkış tarihi')]));
+      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Varış' }), dateInput(arr, function (v) { arr = v || today(); }, 'Varış tarihi'), starPicker(0, function (v) { stars = v; })]));
       box.appendChild(el('div', { class: 'satir' }, [
         el('button', { class: 'dugme', text: 'Zımbala', onclick: function () { go(ops.trip(p.id, { status: 'read', date: arr, stars: stars }), ['VARIŞ', PA.stamp(arr)]); } }),
         el('button', { class: 'kapat', text: 'Peronda’ya geri', onclick: function () { go(ops.trip(p.id, { status: 'toread', dep: null, date: null, stars: 0 })); } })]));
     } else {
-      box.appendChild(el('div', { class: 'etiket', text: 'Varıldı', style: 'color:var(--mercan)' }));
-      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Kalkış' }), dateInput(p.dep, function (v) { go(ops.trip(p.id, { dep: v || null })); })]));
-      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Varış' }), dateInput(p.date, function (v) { if (v) go(ops.trip(p.id, { date: v })); }),
+      box.appendChild(el('div', { class: 'etiket', text: 'Varıldı', style: 'color:var(--mercan-metin)' }));
+      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Kalkış' }), dateInput(p.dep, function (v) { go(ops.trip(p.id, { dep: v || null })); }, 'Kalkış tarihi')]));
+      box.appendChild(el('div', { class: 'satir' }, [el('span', { class: 'soluk', text: 'Varış' }), dateInput(p.date, function (v) { if (v) go(ops.trip(p.id, { date: v })); }, 'Varış tarihi'),
         starPicker(p.stars || 0, function (v) { ops.trip(p.id, { stars: v }).then(function () {}, fail); })]));
       box.appendChild(el('div', { class: 'satir' }, [el('button', { class: 'kapat', text: 'Varışı geri al', onclick: function () { go(ops.trip(p.id, { status: p.dep ? 'reading' : 'toread', date: null, stars: 0 })); } })]));
     }
@@ -731,6 +731,9 @@
     return el('div', { class: 'alinti-form' }, [text, el('div', { style: 'display:flex;gap:8px;align-items:center;margin-top:6px;flex-wrap:wrap' }, [page, save, el('button', { class: 'kapat', text: 'Vazgeç', onclick: cancel })]), msg]);
   }
 
+  // MAKALEYİ AÇ: kullanıcı bağlantısı, açık erişim, doi.org, kayıtlı adres. Yalnız http(s).
+  function openLinkFor(p) { return PA.safeURL(p.userURL) || PA.safeURL(p.oaURL) || (p.doi ? 'https://doi.org/' + p.doi : null) || PA.safeURL(p.url); }
+
   function detail(p) {
     var kids = [
       el('div', { style: 'display:flex;justify-content:space-between;align-items:center' }, [el('div', { class: 'etiket', text: 'Ödünç kartı' }),
@@ -745,7 +748,7 @@
           p.advisor ? el('div', { class: 'soluk', style: 'font-size:12px', text: 'Danışman: ' + p.advisor }) : null,
           p.doi ? el('div', { class: 'soluk', style: 'font-size:12px;margin-top:4px;word-break:break-all', text: 'DOI ' + p.doi }) : null]),
         el('div', { style: 'padding:10px 14px;font-size:13px' }, [
-          p.oaURL || p.url || p.doi || p.userURL ? el('div', {}, [el('a', { href: p.userURL || p.oaURL || (p.doi ? 'https://doi.org/' + p.doi : p.url), target: '_blank', rel: 'noopener noreferrer', text: 'Makaleyi aç ↗' })]) : null])]),
+          openLinkFor(p) ? el('div', {}, [el('a', { href: openLinkFor(p), target: '_blank', rel: 'noopener noreferrer', text: 'Makaleyi aç ↗' })]) : null])]),
       tripBlock(p),
       el('div', { class: 'etiket', text: 'Hatlar', style: 'margin:16px 0 6px' }), lineChips(p),
       el('div', { style: 'height:16px' }), backEditor(p)
@@ -886,7 +889,7 @@
     }
     function build() {
       var k = v.kind, tez = k === 'tez', t = function (s) { s = String(s).trim(); return s || undefined; };
-      var pg = t(v.pages), p = { kind: k, title: v.title.trim(), authors: textToPersons(v.authors), editors: (!tez && k !== 'makale') ? textToPersons(v.editors) : [], year: parseInt(v.year, 10) || undefined, userURL: t(v.userURL) };
+      var pg = t(v.pages), p = { kind: k, title: v.title.trim(), authors: textToPersons(v.authors), editors: (!tez && k !== 'makale') ? textToPersons(v.editors) : [], year: parseInt(v.year, 10) || undefined, userURL: t(v.userURL) && (/^[a-z][a-z0-9+.-]*:\/\//i.test(t(v.userURL)) ? t(v.userURL) : 'https://' + t(v.userURL)) };
       if (tez) {
         Object.assign(p, { institution: t(v.institution), degree: v.degree, thesisNo: t(v.thesisNo), advisor: t(v.advisor), container: undefined, publisher: undefined, volume: undefined, issue: undefined, pages: undefined, articleNo: undefined, doi: undefined });
       } else {
@@ -943,6 +946,7 @@
     }
     file.addEventListener('change', function () {
       var f = file.files && file.files[0]; if (!f) return;
+      if (f.size > 5 * 1024 * 1024) { msg.textContent = 'Dosya çok büyük (en çok 5 MB).'; info.replaceChildren(); save.disabled = true; return; }
       baseName = f.name.replace(/\.[^.]+$/, '') || baseName; msg.textContent = '';
       var rd = new FileReader();
       rd.onload = function () {

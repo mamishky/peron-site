@@ -33,7 +33,10 @@
   }
   function closed(s) { var t = String(s).trim(); if (!t) return t; return '.?!'.indexOf(t[t.length - 1]) >= 0 ? t : t + '.'; }
   function pageRange(s) { return String(s).replace(/\s*[-–—]+\s*/g, '–'); }
-  function link(p) { if (p.doi) return 'https://doi.org/' + p.doi; return p.url || null; }
+  // Güvenlik: bağlantı yalnız http(s), renk yalnız #hex olabilir. Veri paylaşılan hattan ya da içe aktarılan dosyadan gelebilir.
+  function safeURL(u) { return typeof u === 'string' && /^https?:\/\/[^\s]+$/i.test(u.trim()) ? u.trim() : null; }
+  function safeColor(c) { return typeof c === 'string' && /^#[0-9a-f]{3,8}$/i.test(c.trim()) ? c.trim() : '#6e6350'; }
+  function link(p) { if (p.doi) return 'https://doi.org/' + p.doi; return safeURL(p.url); }
   function pubIfDiff(p) {
     if (!p.publisher) return null;
     if ((p.authors || []).some(function (a) { return isOrg(a) && a.name === p.publisher; })) return null;
@@ -142,7 +145,7 @@
     if (p.kind === 'tez') { var inst = p.institution || p.publisher; if (inst) f.push(['PB', inst]); if (p.degree) f.push(['M3', p.degree === 'doktora' ? 'Doktora tezi' : 'Yüksek lisans tezi']); }
     else if (p.publisher) f.push(['PB', p.publisher]);
     if (p.doi) f.push(['DO', p.doi]);
-    var u = p.url || p.oaURL; if (u) f.push(['UR', u]);
+    var u = safeURL(p.url) || safeURL(p.oaURL); if (u) f.push(['UR', u]);
     (lines || []).forEach(function (l) { f.push(['KW', l]); });
     if (p.advisor) f.push(['N1', 'Danışman: ' + p.advisor]);
     noteLines(back).forEach(function (n) { f.push(['N1', n]); });
@@ -190,7 +193,7 @@
     else if (p.kind === 'rapor') { if (p.publisher) f.push(['institution', bibEsc(p.publisher)]); }
     else if (p.publisher) f.push(['publisher', bibEsc(p.publisher)]);
     if (p.doi) f.push(['doi', p.doi]);
-    var u = p.url || p.oaURL; if (u) f.push(['url', u]);
+    var u = safeURL(p.url) || safeURL(p.oaURL); if (u) f.push(['url', u]);
     if (lines && lines.length) f.push(['keywords', lines.map(bibEsc).join(', ')]);
     var notes = noteLines(back); if (p.advisor) notes.unshift('Danışman: ' + p.advisor); if (notes.length) f.push(['note', notes.map(bibEsc).join(' · ')]);
     return '@' + bibType(p) + '{' + key + ',\n' + f.map(function (kv) { return '  ' + kv[0] + ' = {' + kv[1] + '}'; }).join(',\n') + '\n}';
@@ -272,7 +275,7 @@
     if (typeof inst === 'string') p.institution = inst;
     if (p.kind === 'tez' && !p.institution && p.publisher) p.institution = p.publisher;
     p.doi = /^10\./.test(doi || '') ? doi : fallbackDOI;
-    var u = textOf(m.URL); if (u && u.indexOf('doi.org') < 0) p.url = u;
+    var u = safeURL(textOf(m.URL)); if (u && u.indexOf('doi.org') < 0) p.url = u;
     p.status = 'toread';
     return p;
   }
@@ -335,7 +338,7 @@
   }
   function openAccess(doi) {
     return getJSON('https://api.unpaywall.org/v2/' + doiPath(doi) + '?email=' + CONTACT).then(function (o) {
-      var b = o && o.best_oa_location; return b ? (b.url_for_pdf || b.url || null) : null;
+      var b = o && o.best_oa_location; return b ? (safeURL(b.url_for_pdf) || safeURL(b.url) || null) : null;
     }, function () { return null; });
   }
   // Tekrar kuralı (Swift: AcademyData.duplicate): aynı DOI ya da aynı başlık + yıl
@@ -452,7 +455,7 @@
     }
     var pb = first('PB'); if (pb) p.publisher = pb;
     var doi = first('DO'); if (doi) p.doi = doi;
-    var u = first('UR', 'L1', 'L2'); if (u) p.url = u;
+    var u = safeURL(first('UR', 'L1', 'L2')); if (u) p.url = u;
     var m3 = (first('M3', 'C6') || '').toLowerCase();
     if (p.kind === 'tez' && m3) p.degree = /doktora|phd|doctor/.test(m3) ? 'doktora' : 'yukseklisans';
     var groups = []; all('KW').forEach(function (k) { k.split(';').forEach(function (g) { g = g.trim().replace('Peron: ', ''); if (g) groups.push(g); }); });
@@ -553,7 +556,7 @@
         var pub = f.publisher || f.institution || f.organization; if (pub) p.publisher = bibUnescape(pub);
         if (f.school) p.institution = bibUnescape(f.school);
         if (type.toLowerCase() === 'mastersthesis') p.degree = 'yukseklisans'; else if (type.toLowerCase() === 'phdthesis') p.degree = 'doktora';
-        if (f.doi) p.doi = f.doi; if (f.url) p.url = f.url;
+        if (f.doi) p.doi = f.doi; if (safeURL(f.url)) p.url = safeURL(f.url);
         var groups = (f.keywords || f.keyword || '').split(/[,;]/).map(bibUnescape).map(function (g) { return g.replace('Peron: ', ''); }).filter(Boolean);
         var note = f.note || f.annote || f.abstract;
         var r = { paper: p, groups: groups, note: note ? bibUnescape(note).slice(0, NOTE_LIMIT) : null };
@@ -604,6 +607,6 @@
   window.PA = { esc: esc, up: up, KINDS: KINDS, reference: reference, plain: plain, html: html, bibliography: bibliography, inText: inText,
     shortAuthors: shortAuthors, risFile: risFile, bibFile: bibFile, copyRich: copyRich, copyText: copyText, download: download,
     runsToEl: runsToEl, stamp: stamp, noteLines: noteLines,
-    parseImport: parseImport, newId: newId, mapLayout: mapLayout, mixHex: mixHex, textOn: textOn,
+    parseImport: parseImport, newId: newId, safeURL: safeURL, safeColor: safeColor, mapLayout: mapLayout, mixHex: mixHex, textOn: textOn,
     extractDOI: extractDOI, lookupDOI: lookupDOI, lookupTitle: lookupTitle, openAccess: openAccess, findDuplicate: findDuplicate, paperFromCSL: paperFromCSL };
 })();
